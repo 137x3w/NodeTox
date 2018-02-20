@@ -12,59 +12,65 @@ import Avatar from 'material-ui/Avatar';
 import ButtonBase from 'material-ui/ButtonBase';
 
 const styles = theme => ({
-  profileSettingsBody: {
+  ProfileSettingsBodyBody: {
     height: 'calc(100vh - 80px)',
     overflow: 'auto',
   },
-  profileSettingsAvatar: {
+  ProfileSettingsBodyAvatar: {
     cursor: 'pointer',
   },
-  profileSettingsIcon: {
+  ProfileSettingsBodyIcon: {
     width: '40px',
     height: '40px',
   },
-  profileSettingsToxid: {
+  ProfileSettingsBodyToxid: {
     flex: 1,
   },
 });
 
-class ProfileSettings extends React.Component {
+class ProfileSettingsBody extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      nickname: props.nickname || "User",
-      status: props.status || "Status",
-      toxid: props.toxid || "DD5149809F2320BC81215D2A363A95778D39A0BC260BE7DC90923A933552C765A21E305E722C",
-      pass: props.pass || "",
-      avatarSrc: props.avatarSrc || "",
-    }
+    this.state = {};
     this.classes = props.classes;
+  }
+
+  handleProps(props) {
+    var result = {
+      nickname: props.nickname || "",
+      statusMessage: props.statusMessage || "",
+      toxid: props.toxid || "",
+      profilePassword: props.profilePassword || "",
+      avatarSrc: props.avatarSrc || "",
+    };
+    return result;
   }
   
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
-      <Grid item className={ this.classes.profileSettingsBody }>
+      <Grid item className={ this.classes.ProfileSettingsBodyBody }>
         <List subheader={<ListSubheader disableSticky>Public</ListSubheader>}>
           <ListItem>
-            <ListItemIcon className={ this.classes.profileSettingsIcon }>
+            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
               <ButtonBase centerRipple>
-                <Avatar className={ this.classes.profileSettingsAvatar } alt="User avatar" src={ this.state.avatarSrc }>
-                  { this.state.avatarSrc ? null : this.state.nickname.charAt(0) }
+                <Avatar className={ this.classes.ProfileSettingsBodyAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
+                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
                 </Avatar>
               </ButtonBase>
             </ListItemIcon>
             <TextField
-              defaultValue={ this.state.nickname }
+              defaultValue={ this.safeProps.nickname }
               label="Name"
               fullWidth
             />
           </ListItem>
           <ListItem>
-            <ListItemIcon className={ this.classes.profileSettingsIcon }>
+            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
               <ShortTextIcon/>
             </ListItemIcon>
             <TextField              
-              defaultValue={ this.state.status }
+              defaultValue={ this.safeProps.statusMessage }
               label="Status"
               fullWidth
             />
@@ -73,15 +79,12 @@ class ProfileSettings extends React.Component {
             Tox ID
           </ListSubheader>
           <ListItem>
-            <ListItemIcon className={ this.classes.profileSettingsIcon }>
+            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
               <FingerprintIcon/>
             </ListItemIcon>
-            <Typography noWrap variant="subheading" className={ this.classes.profileSettingsToxid }>
-              { this.state.toxid }
+            <Typography noWrap variant="subheading" className={ this.classes.ProfileSettingsBodyToxid }>
+              { this.safeProps.toxid }
             </Typography>
-            <Button>
-              Copy
-            </Button>
             <Button>
               QR Image
             </Button>
@@ -92,8 +95,8 @@ class ProfileSettings extends React.Component {
   }
 } 
 
-ProfileSettings.propTypes = {
+ProfileSettingsBody.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ProfileSettings);
+export default withStyles(styles)(ProfileSettingsBody);

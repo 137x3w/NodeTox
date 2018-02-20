@@ -18,18 +18,24 @@ const styles = theme => ({
 class ChatBodyBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      messages: props.messages || [],
-    }
+    this.state = {};
     this.classes = props.classes;
+  }
+
+  handleProps(props) {
+    var result = {
+      messages: props.messages || [],
+    };
+    return result;
   }
   
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
       <Grid item className={ this.classes.chatBodyBar }>
         <List className={ this.classes.chatBodyBarMessagesList }>
           {
-            this.state.messages.map((item) => (
+            this.safeProps.messages.map((item) => (
               <ChatMessage
                 key={item.uid}
                 nickname={item.nickname}

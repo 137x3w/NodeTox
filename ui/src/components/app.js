@@ -2,13 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
-import ProfileBar from './profileBar';
-import ContactListBar from './contactListBar';
-import FriendChatHeaderBar from './friendChatHeaderBar';
-import ChatTextInputBar from './chatTextInputBar';
-import ChatBodyBar from './chatBodyBar';
-import ProfileSettingsBody from './profileSettingsBody';
-import ProfileSettingsHeader from './profileSettingsHeader';
+
+import SideView from './sideView';
+import FriendChatView from './friendChatView';
+import SettingsView from './settingsView';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import deepPurple from 'material-ui/colors/deepPurple';
@@ -37,128 +34,117 @@ const theme = createMuiTheme({
 
 const styles = theme => ({
   appSceleton: {
-    
-  },
-  sideBar: {
-    // backgroundColor: grey[100],
-  },
-  mainBar: {
     backgroundColor: grey[100],
-  }
+  },
+  sideBar: {},
+  mainBar: {},
 });
 
-var contactsModel = 
-[
-  {
-    nickname: "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-    statusMessage: "1",
+var friendsModel = {};
+for(var i = 0; i < 7; i++) {
+  var uid = Math.random() + "";
+  friendsModel[uid] = {
+    uid: uid,
+    nickname: "User" + uid,
+    statusMessage: "Добро пожаловать в теплую компа",
     avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
-  },
-  {
-    nickname: "1",
-    statusMessage: "1",
-    avatarSrc: "",
-    connectionStatus: 1,
-    unreadMessagesCount: 3,
+    connectionStatus: "none",
+    unreadMessagesCount: 2,
+    messages: [],
   }
-];
+  friendsModel[uid].messages.push({
+    uid: friendsModel[uid].uid,
+    nickname: friendsModel[uid].nickname,
+    avatarSrc: friendsModel[uid].avatarSrc,
+    time: 0,
+    message: "mes1"+uid,
+  });
+}
 
-var messagesModel =
-[
-  {
-    nickname: "1",
-    avatarSrc: "",
-    time: 0,
-    message: "aaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaadfgdfgsf sdgsfsaaaaaaaaa aaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaaaaaaaa",
-    selfMessage: true,
-    repeatedMessageCount: 1,
-  },
-  {
-    nickname: "1",
-    avatarSrc: "",
-    time: 0,
-    message: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  },
-  {
-    nickname: "1",
-    avatarSrc: "",
-    time: 0,
-    message: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  },
-  {
-    nickname: "1",
-    avatarSrc: "",
-    time: 0,
-    message: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  },
-  {
-    nickname: "1",
-    avatarSrc: "",
-    time: 0,
-    message: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  }
-]
+var profileModel = {
+  nickname: "SelfNick",
+  statusMessage: "SelfStatus",
+  avatarSrc: "",
+  connectionStatus: "away",
+  toxid: "DD",
+  profilePassword: "",
+}
 
-contactsModel.map((item, index) => {
-  contactsModel[index].uid = {};
-  contactsModel[index].uid = Math.random() + "";
-});
-
-messagesModel.map((item, index) => {
-  messagesModel[index].uid = {};
-  messagesModel[index].uid = Math.random() + "";
-})
+var appModel = {
+  profile: profileModel,
+  friends: friendsModel,
+}
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      render: {
-        settings: true,
-        friendChat: false,
-        sideBar: true,
-      }
-    };
+
     this.classes = props.classes;
     this.settingsBackClickCallback = this.settingsBackClickCallback.bind(this);
+    this.settingsSaveClickCallback = this.settingsSaveClickCallback.bind(this);
     this.profileBarAvatarClickCallback = this.profileBarAvatarClickCallback.bind(this);
+    this.contactListItemClickCallback = this.contactListItemClickCallback.bind(this);
+    this.friendChatMenuButtonClickCallback = this.friendChatMenuButtonClickCallback.bind(this);
+
+    this.state = {
+      render: {
+        settings: false,
+        friendChat: false,
+        conferenceChat: false,
+        sideBar: true,
+        sideBarXs: true,
+      },
+      model: {
+        sideView: {
+          profileBar: {
+            nickname: appModel.profile.nickname,
+            statusMessage: appModel.profile.statusMessage,
+            avatarSrc: appModel.profile.avatarSrc,
+            connectionStatus: appModel.profile.connectionStatus,
+            avatarClickCallback: this.profileBarAvatarClickCallback,
+          },
+          contactList: {
+            contacts: [],
+            contactListItemClickCallback: this.contactListItemClickCallback,
+          },
+        },
+        friendChatView: {
+          chatHeader: {
+            menuButtonClickCallback: this.friendChatMenuButtonClickCallback,
+          },
+          chatBody: {
+            messages: [],
+          },
+        },
+        settingsView: {
+          header: {
+            backClickCallback: this.settingsBackClickCallback,
+            saveClickCallback: this.settingsSaveClickCallback,
+          },
+          body: {
+            nickname: appModel.profile.nickname,
+            statusMessage: appModel.profile.statusMessage,
+            toxid: appModel.profile.toxid,
+            profilePassword: appModel.profile.profilePassword,
+            avatarSrc: appModel.profile.avatarSrc,
+          },
+        },
+        conferenceChatView: {
+          conferenceChatHeader: {},  
+        }
+      }
+    };
+
+    Object.keys(appModel.friends).forEach((uid, index) => {
+      this.state.model.sideView.contactList.contacts.push({
+        uid: uid,
+        nickname: appModel.friends[uid].nickname,
+        statusMessage: appModel.friends[uid].statusMessage,
+        avatarSrc: appModel.friends[uid].avatarSrc,
+        connectionStatus: appModel.friends[uid].connectionStatus,
+        unreadMessagesCount: appModel.friends[uid].unreadMessagesCount,
+      })
+    });
   }
 
   settingsSaveClickCallback() {
@@ -166,65 +152,110 @@ class App extends React.Component {
   }
 
   settingsBackClickCallback() {
-    this.setState({
+    this.setState((prevState, props) => ({
       render: {
         settings: false,
-        friendChat: true,
-        sideBar: true,
+        friendChat: false,
+        conferenceChat: false,
+        sideBar: prevState.render.sideBar,
+        sideBarXs: prevState.render.sideBarXs,
       }
-    });
+    }));
+  }
+
+  friendChatMenuButtonClickCallback() {
+    this.setState((prevState, props) => ({
+      render: {
+        settings: false,
+        friendChat: false,
+        conferenceChat: false,
+        sideBar: prevState.render.sideBar,
+        sideBarXs: true,
+      }
+    }));
   }
 
   profileBarAvatarClickCallback() {
-    this.setState({
+    this.setState((prevState, props) => ({
       render: {
         settings: true,
         friendChat: false,
-        sideBar: true,
+        conferenceChat: false,
+        sideBar: prevState.render.sideBar,
+        sideBarXs: false,
       }
-    }); 
+    }));
+  }
+
+  contactListItemClickCallback(uid) {     
+    this.setState((prevState, props) => ({
+      render: {
+        settings: false,
+        friendChat: true,
+        conferenceChat: false,
+        sideBar: prevState.render.sideBar,
+        sideBarXs: false,
+      },
+      model: {
+        sideView: prevState.model.sideView,
+        friendChatView: {
+          chatHeader: {
+            nickname: appModel.friends[uid].nickname,
+            statusMessage: appModel.friends[uid].statusMessage,
+            avatarSrc: appModel.friends[uid].avatarSrc,
+            menuButtonClickCallback: prevState.model.friendChatView.chatHeader.menuButtonClickCallback,
+          },
+          chatBody: {
+            messages: appModel.friends[uid].messages,
+          }
+        },
+        conferenceChatView: prevState.model.conferenceChatView,
+        settingsView: prevState.model.settingsView,        
+      }
+    }));
   }
   
   render() {
-    return ( 
+
+    return (
       <MuiThemeProvider theme={theme}>
         <Grid container spacing={0} className={ this.classes.appSceleton }>
           <Grid item hidden={{ smDown: true }} md={4} lg={3} className={ this.classes.sideBar }>
-            { this.state.render.sideBar && 
+            { this.state.render.sideBar &&
               (
-                <ProfileBar connectionStatus="busy" avatarClickCallback={ this.profileBarAvatarClickCallback }/>
+                <SideView
+                  profileBar={ this.state.model.sideView.profileBar }
+                  contactList={ this.state.model.sideView.contactList }
+                />
               ) 
             }
-            { this.state.render.sideBar && 
+          </Grid>
+          <Grid item hidden={{ mdUp: true }} xs={12} className={ this.classes.sideBar }>
+            { this.state.render.sideBarXs &&
               (
-                <ContactListBar contacts={ contactsModel }/>
-              ) 
+                <SideView
+                  profileBar={ this.state.model.sideView.profileBar }
+                  contactList={ this.state.model.sideView.contactList }
+                /> 
+              )
             }
           </Grid>
           <Grid item xs={12} md={8} lg={9} className={ this.classes.mainBar }>
             { this.state.render.friendChat && 
               (
-                <FriendChatHeaderBar/>
+                <FriendChatView
+                  chatHeader={ this.state.model.friendChatView.chatHeader }
+                  chatBody={ this.state.model.friendChatView.chatBody }
+                />
               ) 
             }
-            { this.state.render.friendChat && 
-              (
-                <ChatBodyBar messages={ messagesModel }/>
-              ) 
-            }
-            { this.state.render.friendChat && 
-              (
-                <ChatTextInputBar/>
-              ) 
-            }
+
             { this.state.render.settings && 
               (
-                <ProfileSettingsHeader backClickCallback={ this.settingsBackClickCallback } saveClickCallback={ this.settingsSaveClickCallback }/>
-              ) 
-            }
-            { this.state.render.settings && 
-              (
-                <ProfileSettingsBody/>
+                <SettingsView
+                  header={ this.state.model.settingsView.header }
+                  body={ this.state.model.settingsView.body }
+                />
               ) 
             }
           </Grid>

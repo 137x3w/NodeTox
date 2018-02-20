@@ -5,7 +5,7 @@ import Grid from 'material-ui/Grid';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
-import ArrowBackIcon from 'material-ui-icons/ArrowBack';
+import MenuIcon from 'material-ui-icons/Menu';
 import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui-icons/MoreVert';
@@ -28,28 +28,34 @@ const styles = theme => ({
   }
 });
 
-class FriendChatHeaderBar extends React.Component {
+class ProfileSettingsHeader extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = {};
+    this.classes = props.classes;
+  }
+
+  handleProps(props) {
+    var result = {
       backClickCallback: props.backClickCallback || (() => {}),
       saveClickCallback: props.saveClickCallback || (() => {}),
-    }
-    this.classes = props.classes;
+    };
+    return result;
   }
   
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
       <Grid item className={ this.classes.profileSettingsHeader }>
         <AppBar position="static" elevation={2}>
           <Toolbar className={ this.classes.profileSettingsToolBar }>
-            <IconButton className={ this.classes.profileSettingsBackButton } onClick={ this.state.backClickCallback }>
-              <ArrowBackIcon/>
+            <IconButton className={ this.classes.profileSettingsBackButton } onClick={ this.safeProps.backClickCallback }>
+              <MenuIcon/>
             </IconButton>
             <Typography noWrap variant="title" className={ this.classes.profileSettingsTitle }>
               Settings
             </Typography>
-            <Button onClick={ this.state.saveClickCallback }>
+            <Button onClick={ this.safeProps.saveClickCallback }>
               Done
             </Button>
           </Toolbar>
@@ -59,8 +65,8 @@ class FriendChatHeaderBar extends React.Component {
   }
 }
 
-FriendChatHeaderBar.propTypes = {
+ProfileSettingsHeader.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(FriendChatHeaderBar);
+export default withStyles(styles)(ProfileSettingsHeader);

@@ -9,7 +9,7 @@ import MenuIcon from 'material-ui-icons/Menu';
 import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui-icons/MoreVert';
-
+import classnames from 'classnames';
 import { CardHeader } from 'material-ui/Card';
 
 const styles = theme => ({
@@ -26,7 +26,36 @@ const styles = theme => ({
     },
   },
   friendChatBarHeaderCardHeader: {
-  
+    position: 'relative',
+    '&:after': {
+      borderRadius: '50%',
+      content: "''",
+      width: '10px',
+      height: '10px',
+      position: 'absolute',
+      right: '30%',
+      bottom: '10%',
+    },
+  },
+  offlineConnectionStatus: {
+    '&:after': {
+      backgroundColor: "transparent",
+    }
+  },
+  noneConnectionStatus: {
+    '&:after': {
+      backgroundColor: "#76FF03",
+    }
+  },
+  awayConnectionStatus: {
+    '&:after': {
+      backgroundColor: "#FFEA00",
+    }
+  },
+  busyConnectionStatus: {
+    '&:after': {
+      backgroundColor: "#FF3D00",
+    }
   },
   friendChatBarHeaderAvatar: {
 
@@ -45,34 +74,47 @@ class FriendChatHeaderBar extends React.Component {
     super(props);
     this.state = {
       mobileOpen: false,
-      avatarSrc: props.avatarSrc || "",
-      nickname: props.nickname || "UserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUser",
-      status: props.status || "User statusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatusstatus",
     }
     this.classes = props.classes;
   }
   
+  handleProps(props) {
+    var result = {
+      nickname: props.nickname || "User",
+      statusMessage: props.statusMessage || "Status",
+      avatarSrc: props.avatarSrc || "",
+      connectionStatus: props.connectionStatus || "away",
+      menuButtonClickCallback: props.menuButtonClickCallback || (() => {}),
+    };
+    return result;
+  }
+
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
       <Grid item className={ this.classes.friendChatBarHeader }>
         <AppBar position="static" elevation={2}>
           <Toolbar className={ this.classes.friendChatBarHeaderToolBar }>
-            <IconButton className={ this.classes.friendChatBarHeaderMenuButton }>
+            <IconButton className={ this.classes.friendChatBarHeaderMenuButton }
+              onClick={ this.safeProps.menuButtonClickCallback }
+            >
               <MenuIcon />
             </IconButton>
-            <CardHeader className={ this.classes.friendChatBarHeaderCardHeader }
-                avatar={
-                  <Avatar className={ this.classes.friendChatBarHeaderAvatar } alt="User avatar" src={ this.state.avatarSrc }>
-                    { this.state.avatarSrc ? null : this.state.nickname.charAt(0) }
-                  </Avatar>
-                }
+            <CardHeader className={ 
+              classnames(this.classes.friendChatBarHeaderCardHeader, this.classes[this.safeProps.connectionStatus + 'ConnectionStatus'])
+            }
+              avatar={
+                <Avatar className={ this.classes.friendChatBarHeaderAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
+                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
+                </Avatar>
+              }
             />
             <Grid item xs zeroMinWidth>
-              <Typography noWrap gutterBottom className={ this.classes.friendChatBarHeaderNickname }>
-                { this.state.nickname }
+              <Typography noWrap className={ this.classes.friendChatBarHeaderNickname }>
+                { this.safeProps.nickname }
               </Typography>
               <Typography variant="caption" noWrap gutterBottom className={ this.classes.friendChatBarHeaderStatus }>
-                { this.state.status }
+                { this.safeProps.statusMessage }
               </Typography>
             </Grid>
             <IconButton>

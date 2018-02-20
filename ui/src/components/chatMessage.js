@@ -43,39 +43,40 @@ const styles = theme => ({
     color: theme.palette.grey.light,
     overflowX: 'auto',
   },
-  chatMessageRepeat: {
-    color: theme.palette.grey.light,
-    fontWeight: '100',
-  },
 });
 
 class ChatMessage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      nickname: props.nickname || "User",
-      avatarSrc: props.avatarSrc || "",
-      message: props.message || "",
-      time: props.time || 0,
-      selfMessage: props.selfMessage || false,
-      repeatedMessageCount: props.repeatedMessageCount || 0,
-    }
+    this.state = {};
     this.classes = props.classes;
   }
 
   formatTime(unixTime) {
     return unixTime;
   }
+
+  handleProps(props) {
+    var result = {
+      nickname: props.nickname || "User",
+      avatarSrc: props.avatarSrc || "",
+      message: props.message || "",
+      time: props.time || 0,
+      selfMessage: props.selfMessage || false,
+    };
+    return result;
+  }
   
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
       <ListItem className={this.classes.chatMessage}>
         <Grid item xs={2} sm={1}>
           {
-            this.state.selfMessage ? null : 
+            this.safeProps.selfMessage ? null : 
               (
-                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.state.avatarSrc }>
-                  { this.state.avatarSrc ? null : this.state.nickname.charAt(0) }
+                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
+                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
                 </Avatar>
               ) 
           }
@@ -84,36 +85,27 @@ class ChatMessage extends React.Component {
           <Card elevation={2} className={ this.classes.chatMessageContainer }>
             <CardContent className={ this.classes.chatMessageContent }>
               <Typography noWrap className={ this.classes.chatMessageNickname }>
-                { this.state.nickname }
+                { this.safeProps.nickname }
               </Typography>
               <Typography variant="caption" noWrap gutterBottom className={ this.classes.chatMessageTime }>
-                { this.formatTime(this.state.time) }
+                { this.formatTime(this.safeProps.time) }
               </Typography>
               <Typography component="p" gutterBottom className={ this.classes.chatMessageMessage }>
-                { this.state.message }
+                { this.safeProps.message }
               </Typography>
-              {
-                this.state.repeatedMessageCount > 0 ? 
-                (
-                  <Typography variant="caption" noWrap className={ this.classes.chatMessageRepeat }>
-                    {`x${ this.state.repeatedMessageCount }`}
-                  </Typography>
-                ) : null
-              }
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={2} sm={1}>
           {
-            this.state.selfMessage ? 
+            this.safeProps.selfMessage ? 
               (
-                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.state.avatarSrc }>
-                  { this.state.avatarSrc ? null : this.state.nickname.charAt(0) }
+                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
+                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
                 </Avatar>
               ) : null
           }
         </Grid>
-        
       </ListItem>
     );
   }

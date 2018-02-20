@@ -21,8 +21,8 @@ const styles = theme => ({
     '&:after': {
       borderRadius: '50%',
       content: "''",
-      width: '8px',
-      height: '8px',
+      width: '10px',
+      height: '10px',
       position: 'absolute',
       bottom: '0',
       right: '0',
@@ -74,36 +74,41 @@ class ProfileBar extends React.Component {
   constructor(props) {
     super(props);
     this.classes = props.classes;
-    this.state = {
+    this.state = {};
+  }
+
+  handleProps(props) {
+    var result = {
       nickname: props.nickname || "User",
-      status: props.status || "User status",
+      statusMessage: props.statusMessage || "User status",
       avatarSrc: props.avatarSrc || "",  
-      avatarClickCallback: props.avatarClickCallback || (() => {}),
       connectionStatus: props.connectionStatus || "offline",
+      avatarClickCallback: props.avatarClickCallback || (() => {}),
     }
+    return result;
   }
 
   render() {
-    // console.log(this.state.connectionStatus);
+    this.safeProps = this.handleProps(this.props);
     return (
       <Grid item align="center" className={ this.classes.profileBar }>
         <Grid item>
           <ButtonBase centerRipple className={ 
-            classnames(this.classes.avatarButton, this.classes[this.state.connectionStatus + 'ConnectionStatus']) 
-          } onClick={ this.state.avatarClickCallback }>
-            <Avatar className={ this.classes.profileBarAvatar } alt="User avatar" src={ this.state.avatarSrc }>
-              { this.state.avatarSrc ? null : this.state.nickname.charAt(0) }
+            classnames(this.classes.avatarButton, this.classes[this.safeProps.connectionStatus + 'ConnectionStatus']) 
+          } onClick={ this.safeProps.avatarClickCallback }>
+            <Avatar className={ this.classes.profileBarAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
+              { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
             </Avatar>
           </ButtonBase>
         </Grid>
         <Grid item xs={10}>
           <Typography align="center" noWrap gutterBottom className={ this.classes.profileBarNickname }>
-            { this.state.nickname }
+            { this.safeProps.nickname }
           </Typography>
         </Grid>
         <Grid item xs={10}>
           <Typography variant="caption" align="center" noWrap gutterBottom className={ this.classes.profileBarStatus }>
-            { this.state.status }
+            { this.safeProps.statusMessage }
           </Typography>
         </Grid>
       </Grid>
@@ -115,7 +120,7 @@ ProfileBar.propTypes = {
   classes: PropTypes.object.isRequired,
   avatarSrc: PropTypes.string,
   nickname: PropTypes.string,
-  status: PropTypes.string,
+  statusMessage: PropTypes.string,
 };
 
 export default withStyles(styles)(ProfileBar);
