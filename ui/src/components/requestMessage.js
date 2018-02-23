@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { ListItem } from 'material-ui/List';
-import Avatar from 'material-ui/Avatar';
 import Typography from 'material-ui/Typography';
-import Card, { CardContent } from 'material-ui/Card';
+import Card, { CardContent, CardActions } from 'material-ui/Card';
 import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
 
 const styles = theme => ({
   chatMessage: {
@@ -13,13 +13,6 @@ const styles = theme => ({
     alignItems: 'flex-start',
     paddingLeft: '0',
     paddingRight: '0',
-  },
-  chatMessageAvatar: {
-    width: '30px',
-    height: '30px',
-    margin: '0 auto',
-    marginTop: '15px',
-    backgroundColor: theme.palette.secondary.main,
   },
   chatMessageNickname: {
     color: theme.palette.grey.light,
@@ -31,9 +24,10 @@ const styles = theme => ({
   },
   chatMessageContainer: {
     backgroundColor: theme.palette.primary.main,
+    // margin: '0 0 0 auto',
   },
   chatMessageContent: {
-    padding: '16px !important',
+    paddingBottom: '0',
   },
   chatMessageMessage: {
     color: theme.palette.grey.light,
@@ -41,7 +35,7 @@ const styles = theme => ({
   },
 });
 
-class ChatMessage extends React.Component {
+class RequestMessage extends React.Component {
   constructor(props) {
     super(props);
     this.classes = props.classes;
@@ -54,17 +48,8 @@ class ChatMessage extends React.Component {
   render() {
     return (    
       <ListItem className={this.classes.chatMessage}>
-        <Grid item xs={2} sm={1}>
-          {
-            this.props.selfMessage ? null : 
-              (
-                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.props.avatarSrc }>
-                  { this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
-                </Avatar>
-              ) 
-          }
-        </Grid>
-        <Grid item xs={8} sm={10}>
+        <Grid item xs={1}/>
+        <Grid item xs={10}>
           <Card elevation={2} className={ this.classes.chatMessageContainer }>
             <CardContent className={ this.classes.chatMessageContent }>
               <Typography noWrap className={ this.classes.chatMessageNickname }>
@@ -77,38 +62,33 @@ class ChatMessage extends React.Component {
                 { this.props.message }
               </Typography>
             </CardContent>
+            <CardActions>
+              <Button color="secondary">
+                Allow
+              </Button>
+              <Button color="secondary">
+                Deny
+              </Button>
+            </CardActions>
           </Card>
         </Grid>
-        <Grid item xs={2} sm={1}>
-          {
-            this.props.selfMessage ? 
-              (
-                <Avatar className={ this.classes.chatMessageAvatar } alt="User avatar" src={ this.props.avatarSrc }>
-                  { this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
-                </Avatar>
-              ) : null
-          }
-        </Grid>
+        <Grid item xs={1}/>
       </ListItem>
     );
   }
 }
 
-ChatMessage.propTypes = {
+RequestMessage.propTypes = {
   classes: PropTypes.object.isRequired,
   nickname: PropTypes.string,
-  avatarSrc: PropTypes.string,
   message: PropTypes.string,
   time: PropTypes.number,
-  selfMessage: PropTypes.bool,
 };
 
-ChatMessage.defaultProps = {
+RequestMessage.defaultProps = {
   nickname: "Default nickname",
-  avatarSrc: "",
   message: "Default message",
   time: 0,
-  selfMessage: false,
 }
 
-export default withStyles(styles)(ChatMessage);
+export default withStyles(styles)(RequestMessage);

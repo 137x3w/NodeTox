@@ -5,7 +5,7 @@ import Grid from 'material-ui/Grid';
 
 import SideView from './sideView';
 import FriendChatView from './friendChatView';
-import SettingsView from './settingsView';
+import DashboardView from './dashboardView';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import deepPurple from 'material-ui/colors/deepPurple';
@@ -36,225 +36,198 @@ const styles = theme => ({
   appSceleton: {
     backgroundColor: grey[100],
   },
-  sideBar: {},
-  mainBar: {},
 });
-
-var friendsModel = {};
-for(var i = 0; i < 7; i++) {
-  var uid = Math.random() + "";
-  friendsModel[uid] = {
-    uid: uid,
-    nickname: "User" + uid,
-    statusMessage: "Добро пожаловать в теплую компа",
-    avatarSrc: "",
-    connectionStatus: "none",
-    unreadMessagesCount: 2,
-    messages: [],
-  }
-  friendsModel[uid].messages.push({
-    uid: friendsModel[uid].uid,
-    nickname: friendsModel[uid].nickname,
-    avatarSrc: friendsModel[uid].avatarSrc,
-    time: 0,
-    message: "mes1"+uid,
-  });
-}
-
-var profileModel = {
-  nickname: "SelfNick",
-  statusMessage: "SelfStatus",
-  avatarSrc: "",
-  connectionStatus: "away",
-  toxid: "DD",
-  profilePassword: "",
-}
-
-var appModel = {
-  profile: profileModel,
-  friends: friendsModel,
-}
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.classes = props.classes;
-    this.settingsBackClickCallback = this.settingsBackClickCallback.bind(this);
+
     this.settingsSaveClickCallback = this.settingsSaveClickCallback.bind(this);
-    this.profileBarAvatarClickCallback = this.profileBarAvatarClickCallback.bind(this);
-    this.contactListItemClickCallback = this.contactListItemClickCallback.bind(this);
+    this.profileBarClickCallback = this.profileBarClickCallback.bind(this);
+    this.contactClickCallback = this.contactClickCallback.bind(this);
+    this.contactsTabClickCallbackSm = this.contactsTabClickCallbackSm.bind(this);
     this.friendChatMenuButtonClickCallback = this.friendChatMenuButtonClickCallback.bind(this);
 
     this.state = {
       render: {
-        settings: false,
-        friendChat: false,
-        conferenceChat: false,
-        sideBar: true,
-        sideBarXs: true,
+        default: {
+          dashboard: true,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: true,
+        },
+        small: {
+          dashboard: false,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: true,
+        },
       },
-      model: {
-        sideView: {
-          profileBar: {
-            nickname: appModel.profile.nickname,
-            statusMessage: appModel.profile.statusMessage,
-            avatarSrc: appModel.profile.avatarSrc,
-            connectionStatus: appModel.profile.connectionStatus,
-            avatarClickCallback: this.profileBarAvatarClickCallback,
-          },
-          contactList: {
-            contacts: [],
-            contactListItemClickCallback: this.contactListItemClickCallback,
-          },
+    };
+  }
+
+  contactsTabClickCallbackSm() {
+    this.setState((prevState, props) => ({
+      render: {
+        default: {
+          dashboard: true,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: prevState.render.default.sideBar,
         },
-        friendChatView: {
-          chatHeader: {
-            menuButtonClickCallback: this.friendChatMenuButtonClickCallback,
-          },
-          chatBody: {
-            messages: [],
-          },
-        },
-        settingsView: {
-          header: {
-            backClickCallback: this.settingsBackClickCallback,
-            saveClickCallback: this.settingsSaveClickCallback,
-          },
-          body: {
-            nickname: appModel.profile.nickname,
-            statusMessage: appModel.profile.statusMessage,
-            toxid: appModel.profile.toxid,
-            profilePassword: appModel.profile.profilePassword,
-            avatarSrc: appModel.profile.avatarSrc,
-          },
-        },
-        conferenceChatView: {
-          conferenceChatHeader: {},  
+        small: {
+          dashboard: false,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: true,
         }
       }
-    };
-
-    Object.keys(appModel.friends).forEach((uid, index) => {
-      this.state.model.sideView.contactList.contacts.push({
-        uid: uid,
-        nickname: appModel.friends[uid].nickname,
-        statusMessage: appModel.friends[uid].statusMessage,
-        avatarSrc: appModel.friends[uid].avatarSrc,
-        connectionStatus: appModel.friends[uid].connectionStatus,
-        unreadMessagesCount: appModel.friends[uid].unreadMessagesCount,
-      })
-    });
+    }));
   }
 
   settingsSaveClickCallback() {
 
   }
 
-  settingsBackClickCallback() {
-    this.setState((prevState, props) => ({
-      render: {
-        settings: false,
-        friendChat: false,
-        conferenceChat: false,
-        sideBar: prevState.render.sideBar,
-        sideBarXs: prevState.render.sideBarXs,
-      }
-    }));
-  }
-
   friendChatMenuButtonClickCallback() {
     this.setState((prevState, props) => ({
       render: {
-        settings: false,
-        friendChat: false,
-        conferenceChat: false,
-        sideBar: prevState.render.sideBar,
-        sideBarXs: true,
-      }
-    }));
-  }
-
-  profileBarAvatarClickCallback() {
-    this.setState((prevState, props) => ({
-      render: {
-        settings: true,
-        friendChat: false,
-        conferenceChat: false,
-        sideBar: prevState.render.sideBar,
-        sideBarXs: false,
-      }
-    }));
-  }
-
-  contactListItemClickCallback(uid) {     
-    this.setState((prevState, props) => ({
-      render: {
-        settings: false,
-        friendChat: true,
-        conferenceChat: false,
-        sideBar: prevState.render.sideBar,
-        sideBarXs: false,
-      },
-      model: {
-        sideView: prevState.model.sideView,
-        friendChatView: {
-          chatHeader: {
-            nickname: appModel.friends[uid].nickname,
-            statusMessage: appModel.friends[uid].statusMessage,
-            avatarSrc: appModel.friends[uid].avatarSrc,
-            menuButtonClickCallback: prevState.model.friendChatView.chatHeader.menuButtonClickCallback,
-          },
-          chatBody: {
-            messages: appModel.friends[uid].messages,
-          }
+        default: {
+          dashboard: true,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: prevState.render.default.sideBar,  
         },
-        conferenceChatView: prevState.model.conferenceChatView,
-        settingsView: prevState.model.settingsView,        
+        small: {
+          dashboard: false,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: true,
+        }
       }
+    }));
+  }
+
+  profileBarClickCallback() {
+    this.setState((prevState, props) => ({
+      render: {
+        default: {
+          dashboard: true,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: prevState.render.default.sideBar,
+        },
+        small: {
+          dashboard: true,
+          friendChat: false,
+          conferenceChat: false,
+          sideBar: false,
+        }
+      }
+    }));
+  }
+
+  contactClickCallback(uid) {
+    this.props.newFriendChatView(uid);
+    this.setState((prevState, props) => ({
+      render: {
+        default: {
+          dashboard: false,
+          friendChat: true,
+          conferenceChat: false,
+          sideBar: prevState.render.default.sideBar,
+        },
+        small: {
+          dashboard: false,
+          friendChat: true,
+          conferenceChat: false,
+          sideBar: false,
+        },
+      },
     }));
   }
   
   render() {
-
     return (
       <MuiThemeProvider theme={theme}>
         <Grid container spacing={0} className={ this.classes.appSceleton }>
-          <Grid item hidden={{ smDown: true }} md={4} lg={3} className={ this.classes.sideBar }>
-            { this.state.render.sideBar &&
+          <Grid item hidden={{ mdUp: true }} xs={12}>
+            { this.state.render.small.sideBar &&
               (
                 <SideView
-                  profileBar={ this.state.model.sideView.profileBar }
-                  contactList={ this.state.model.sideView.contactList }
-                />
-              ) 
-            }
-          </Grid>
-          <Grid item hidden={{ mdUp: true }} xs={12} className={ this.classes.sideBar }>
-            { this.state.render.sideBarXs &&
-              (
-                <SideView
-                  profileBar={ this.state.model.sideView.profileBar }
-                  contactList={ this.state.model.sideView.contactList }
+                  profileBar={ this.props.view.sideView.profileBar }
+                  profileBarClickCallback={ this.profileBarClickCallback }
+                  contactList={ this.props.view.sideView.contactList }
+                  contactListItemClickCallback={ this.contactClickCallback }
                 /> 
               )
             }
           </Grid>
-          <Grid item xs={12} md={8} lg={9} className={ this.classes.mainBar }>
-            { this.state.render.friendChat && 
+          <Grid item hidden={{ smDown: true }} md={4} lg={3}>
+            { this.state.render.default.sideBar &&
               (
-                <FriendChatView
-                  chatHeader={ this.state.model.friendChatView.chatHeader }
-                  chatBody={ this.state.model.friendChatView.chatBody }
+                <SideView
+                  profileBar={ this.props.view.sideView.profileBar }
+                  profileBarClickCallback={ this.profileBarClickCallback }
+                  contactList={ this.props.view.sideView.contactList }
+                  contactListItemClickCallback={ this.contactClickCallback }
                 />
               ) 
             }
-
-            { this.state.render.settings && 
+          </Grid>
+          <Grid item hidden={{ mdUp: true }} xs={12} className={ this.classes.mainBar }>
+            { this.state.render.small.dashboard && 
               (
-                <SettingsView
-                  header={ this.state.model.settingsView.header }
-                  body={ this.state.model.settingsView.body }
+                <DashboardView
+                  contactsTabClickCallback={ this.contactsTabClickCallbackSm }
+                  dashboardBody={ this.props.view.dashboardView.body }
+                />
+              ) 
+            }
+            { this.state.render.small.friendChat && 
+              (
+                <FriendChatView
+                  chatHeader={ this.props.view.friendChatView.header }
+                  menuButtonClickCallback={ this.friendChatMenuButtonClickCallback }
+                  chatBody={ this.props.view.friendChatView.body }
+                />
+              ) 
+            }
+            { this.state.render.small.conferenceChat && 
+              (
+                <FriendChatView
+                  chatHeader={ this.props.view.friendChatView.header }
+                  menuButtonClickCallback={ this.chatMenuButtonClickCallback }
+                  chatBody={ this.props.view.friendChatView.body }
+                />
+              ) 
+            }
+          </Grid>
+          <Grid item hidden={{ smDown: true }} md={8} lg={9} className={ this.classes.mainBar }>
+            { this.state.render.default.dashboard && 
+              (
+                <DashboardView
+                  contactsTabClickCallback={ this.contactsTabClickCallbackSm }
+                  dashboardBody={ this.props.view.dashboardView.body }
+                />
+              ) 
+            }
+            { this.state.render.default.friendChat && 
+              (
+                <FriendChatView
+                  chatHeader={ this.props.view.friendChatView.header }
+                  menuButtonClickCallback={ this.friendChatMenuButtonClickCallback }
+                  chatBody={ this.props.view.friendChatView.body }
+                />
+              ) 
+            }
+            { this.state.render.default.conferenceChat && 
+              (
+                <FriendChatView
+                  chatHeader={ this.props.view.friendChatView.header }
+                  menuButtonClickCallback={ this.chatMenuButtonClickCallback }
+                  chatBody={ this.props.view.friendChatView.body }
                 />
               ) 
             }
@@ -267,6 +240,11 @@ class App extends React.Component {
 
 App.propTypes = {
   classes: PropTypes.object.isRequired,
+  newFriendChatView: PropTypes.func,
+};
+
+App.defaultProps = {
+  newFriendChatView: (() => {}),
 };
 
 export default withStyles(styles)(App);

@@ -5,60 +5,22 @@ import Grid from 'material-ui/Grid';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
+import MediaAvatar from './mediaAvatar';
 import MenuIcon from 'material-ui-icons/Menu';
-import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui-icons/MoreVert';
 import classnames from 'classnames';
 import { CardHeader } from 'material-ui/Card';
 
 const styles = theme => ({
-  friendChatBarHeader: {
-    
-  },
   friendChatBarHeaderToolBar: {
-    backgroundColor: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.grey.light,
     minHeight: '80px',
   },  
   friendChatBarHeaderMenuButton: {
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
-  },
-  friendChatBarHeaderCardHeader: {
-    position: 'relative',
-    '&:after': {
-      borderRadius: '50%',
-      content: "''",
-      width: '10px',
-      height: '10px',
-      position: 'absolute',
-      right: '30%',
-      bottom: '10%',
-    },
-  },
-  offlineConnectionStatus: {
-    '&:after': {
-      backgroundColor: "transparent",
-    }
-  },
-  noneConnectionStatus: {
-    '&:after': {
-      backgroundColor: "#76FF03",
-    }
-  },
-  awayConnectionStatus: {
-    '&:after': {
-      backgroundColor: "#FFEA00",
-    }
-  },
-  busyConnectionStatus: {
-    '&:after': {
-      backgroundColor: "#FF3D00",
-    }
-  },
-  friendChatBarHeaderAvatar: {
-
   },
   friendChatBarHeaderNickname: {
     fontWeight: '500',
@@ -72,49 +34,36 @@ const styles = theme => ({
 class FriendChatHeaderBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      mobileOpen: false,
-    }
     this.classes = props.classes;
-  }
-  
-  handleProps(props) {
-    var result = {
-      nickname: props.nickname || "User",
-      statusMessage: props.statusMessage || "Status",
-      avatarSrc: props.avatarSrc || "",
-      connectionStatus: props.connectionStatus || "away",
-      menuButtonClickCallback: props.menuButtonClickCallback || (() => {}),
-    };
-    return result;
   }
 
   render() {
-    this.safeProps = this.handleProps(this.props);
     return (    
-      <Grid item className={ this.classes.friendChatBarHeader }>
+      <Grid item>
         <AppBar position="static" elevation={2}>
           <Toolbar className={ this.classes.friendChatBarHeaderToolBar }>
             <IconButton className={ this.classes.friendChatBarHeaderMenuButton }
-              onClick={ this.safeProps.menuButtonClickCallback }
+              onClick={ this.props.menuButtonClickCallback }
             >
               <MenuIcon />
             </IconButton>
             <CardHeader className={ 
-              classnames(this.classes.friendChatBarHeaderCardHeader, this.classes[this.safeProps.connectionStatus + 'ConnectionStatus'])
+              classnames(this.classes.friendChatBarHeaderCardHeader, this.classes[this.props.connectionStatus + 'ConnectionStatus'])
             }
               avatar={
-                <Avatar className={ this.classes.friendChatBarHeaderAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
-                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
-                </Avatar>
+                <MediaAvatar
+                  src={ this.props.avatarSrc }
+                  char={ this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
+                  connectionStatus={ this.props.connectionStatus }
+                />
               }
             />
             <Grid item xs zeroMinWidth>
               <Typography noWrap className={ this.classes.friendChatBarHeaderNickname }>
-                { this.safeProps.nickname }
+                { this.props.nickname }
               </Typography>
               <Typography variant="caption" noWrap gutterBottom className={ this.classes.friendChatBarHeaderStatus }>
-                { this.safeProps.statusMessage }
+                { this.props.statusMessage }
               </Typography>
             </Grid>
             <IconButton>
@@ -129,6 +78,19 @@ class FriendChatHeaderBar extends React.Component {
 
 FriendChatHeaderBar.propTypes = {
   classes: PropTypes.object.isRequired,
+  nickname: PropTypes.string,
+  statusMessage: PropTypes.string,
+  avatarSrc: PropTypes.string,
+  connectionStatus: PropTypes.string,
+  menuButtonClickCallback: PropTypes.func,
 };
+
+FriendChatHeaderBar.defaultProps = {
+  nickname: "Default nickname",
+  statusMessage: "Default status message",
+  avatarSrc: "",
+  connectionStatus: "offline",
+  menuButtonClickCallback: (() => {}),
+}
 
 export default withStyles(styles)(FriendChatHeaderBar);

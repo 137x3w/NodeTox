@@ -9,7 +9,7 @@ const styles = theme => ({
   contactsListBar: {
     overflow: 'auto',
     minHeight: '120px',
-    height: 'calc(100vh - 135px)',
+    height: 'calc(100vh - 87px)',
     backgroundColor: theme.palette.primary.main,
   },
 });
@@ -17,25 +17,15 @@ const styles = theme => ({
 class ContactListBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.classes = props.classes;
-  }
-  
-  handleProps(props) {
-    var result = {
-      contacts: props.contacts || [],
-      contactListItemClickCallback: props.contactListItemClickCallback || (() => {}),
-    }
-    return result;
   }
 
   render() {
-    this.safeProps = this.handleProps(this.props);
     return (    
       <Grid item align="center" className={ this.classes.contactsListBar }>
-        <List disablePadding className={ this.classes.contactList }>
+        <List disablePadding>
           {
-            this.safeProps.contacts.map((item) => (
+            this.props.contacts.map((item) => (
               <ContactListItem
                 key={item.uid}
                 uid={item.uid}
@@ -44,7 +34,7 @@ class ContactListBar extends React.Component {
                 avatarSrc={item.avatarSrc}
                 connectionStatus={item.connectionStatus}
                 unreadMessagesCount={item.unreadMessagesCount}
-                listItemClickCallback={this.safeProps.contactListItemClickCallback}
+                clickCallback={this.props.contactClickCallback}
               />
             ))
           }          
@@ -56,6 +46,11 @@ class ContactListBar extends React.Component {
 
 ContactListBar.propTypes = {
   classes: PropTypes.object.isRequired,
+  contacts: PropTypes.array,
 };
+
+ContactListBar.defaultProps = {
+  contacts: [],
+}
 
 export default withStyles(styles)(ContactListBar);
