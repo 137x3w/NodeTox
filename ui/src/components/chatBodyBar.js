@@ -9,7 +9,6 @@ const styles = theme => ({
   chatBodyBar: {
     overflow: 'auto',
     height: 'calc(100vh - 160px)',
-    background: theme.palette.grey.light,
   },
   chatBodyBarMessagesList: {
 
@@ -19,24 +18,32 @@ const styles = theme => ({
 class ChatBodyBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      messages: props.messages || [],
-    }
+    this.state = {};
     this.classes = props.classes;
+  }
+
+  handleProps(props) {
+    var result = {
+      messages: props.messages || [],
+    };
+    return result;
   }
   
   render() {
+    this.safeProps = this.handleProps(this.props);
     return (    
       <Grid item className={ this.classes.chatBodyBar }>
         <List className={ this.classes.chatBodyBarMessagesList }>
           {
-            this.state.messages.map((item) => (
+            this.safeProps.messages.map((item) => (
               <ChatMessage
                 key={item.uid}
                 nickname={item.nickname}
                 avatarSrc={item.avatarSrc}
-                time={item.time}
                 message={item.message}
+                time={item.time}
+                selfMessage={item.selfMessage}
+                repeatedMessageCount={item.repeatedMessageCount}
               />
             ))
           }

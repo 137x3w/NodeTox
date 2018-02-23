@@ -11,12 +11,13 @@ import SendIcon from 'material-ui-icons/Send';
 
 const styles = theme => ({
   chatTextInputBar: {
-    minWidth: '320px',
   },
   chatTextInputBarToolBar: {
     backgroundColor: theme.palette.primary.contrastText,
-    minHeight: '60px',
+    minHeight: '80px',
   },
+  chatTextInputBarInput: {    
+  }
 });
 
 class ChatTextInputBar extends React.Component {
@@ -29,21 +30,19 @@ class ChatTextInputBar extends React.Component {
   render() {
     return (    
       <Grid item className={ this.classes.chatTextInputBar }>
-        <AppBar position="static" elevation={0}>
-          <Toolbar className={ this.classes.chatTextInputBarToolBar }>
-            <Grid item xs zeroMinWidth>
-              <Input multiline fullWidth rows="2" endAdornment={
-                <InputAdornment position="end">
-                    <IconButton color="primary" aria-label="Smiles">
-                      <FaceIcon/>
-                    </IconButton>
-                    <IconButton color="primary" aria-label="Send">
-                      <SendIcon/>
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />              
-            </Grid>
+        <AppBar position="static" elevation={2}>
+          <Toolbar className={ this.classes.chatTextInputBarToolBar }>            
+            <Input margin='dense' multiline fullWidth rows="1" className={ this.classes.chatTextInputBarInput } endAdornment={
+              <InputAdornment position="end">
+                  <IconButton color="primary" aria-label="Smiles">
+                    <FaceIcon/>
+                  </IconButton>
+                  <IconButton color="primary" aria-label="Send">
+                    <SendIcon/>
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
           </Toolbar>
         </AppBar>
       </Grid>
