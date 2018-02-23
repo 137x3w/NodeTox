@@ -1,40 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import ProfileSettingsHeader from './profileSettingsHeader';
-import ProfileSettingsBody from './profileSettingsBody';
-
-const styles = theme => ({});
+import DashboardHeader from './dashboardHeader';
+import DashboardBody from './dashboardBody';
 
 class DashboardView extends React.Component {
   constructor(props) {
     super(props);
-    this.classes = props.classes;
-    this.state = {};
+    this.state = {
+      tabIndex: 0,
+    };
+    this.tabClickCallback = this.tabClickCallback.bind(this);
   }
 
-  handleProps(props) {
-    var result = {
-      header: props.header || {},
-      body: props.body || [],
-    }
-    return result;
+  tabClickCallback(tabIndex) {
+    this.setState((prevState, props) => ({
+      tabIndex: tabIndex,
+    }));
   }
 
   render() {
-    this.safeProps = this.handleProps(this.props);
     return (
     	<div>
-        <ProfileSettingsHeader
-          backClickCallback={ this.safeProps.header.backClickCallback }
-          saveClickCallback={ this.safeProps.body.saveClickCallback }
+        <DashboardHeader 
+          tabClickCallback={ this.tabClickCallback }
+          contactsTabClickCallback={ this.props.contactsTabClickCallback }
         />
-        <ProfileSettingsBody
-          nickname={ this.safeProps.body.nickname }
-          statusMessage={ this.safeProps.body.statusMessage }
-          toxid={ this.safeProps.body.toxid }
-          profilePassword={ this.safeProps.body.profilePassword }
-          avatarSrc={ this.safeProps.body.avatarSrc }
+        <DashboardBody 
+          renderIndex={ this.state.tabIndex }
+          friendsControl={ this.props.dashboardBody.friendsControl }
+          groupsControl={ this.props.dashboardBody.groupsControl }
+          filesControl={ this.props.dashboardBody.filesControl }
+          settings={ this.props.dashboardBody.settings }
         />
     	</div>
     );
@@ -42,7 +38,11 @@ class DashboardView extends React.Component {
 }
 
 DashboardView.propTypes = {
-  classes: PropTypes.object.isRequired,
+  contactsTabClickCallback: PropTypes.func,
 };
 
-export default withStyles(styles)(DashboardView);
+DashboardView.defaultProps = {
+  contactsTabClickCallback: (() => {}),
+}
+
+export default DashboardView;

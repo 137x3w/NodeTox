@@ -1,40 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
 import FriendChatHeader from './friendChatHeaderBar';
 import ChatBodyBar from './chatBodyBar';
 import ChatTextInputBar from './chatTextInputBar';
 
-const styles = theme => ({});
-
 class FriendChatView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.classes = props.classes;
-    this.state = {};
-  }
-
-  handleProps(props) {
-    var result = {
-      chatHeader: props.chatHeader || {},
-      chatBody: props.chatBody || [],
-    }
-    return result;
-  }
-
   render() {
-    this.safeProps = this.handleProps(this.props);
     return (
     	<div>
         <FriendChatHeader
-          avatarSrc={ this.safeProps.chatHeader.avatarSrc } 
-          nickname={ this.safeProps.chatHeader.nickname }
-          statusMessage={ this.safeProps.chatHeader.statusMessage }
-          connectionStatus={ this.safeProps.chatHeader.connectionStatus }
-          menuButtonClickCallback={ this.safeProps.chatHeader.menuButtonClickCallback }
+          avatarSrc={ this.props.chatHeader.avatarSrc } 
+          nickname={ this.props.chatHeader.nickname }
+          statusMessage={ this.props.chatHeader.statusMessage }
+          connectionStatus={ this.props.chatHeader.connectionStatus }
+          menuButtonClickCallback={ this.props.menuButtonClickCallback }
         />
 	    	<ChatBodyBar
-	        messages={ this.safeProps.chatBody.messages }
+	        messages={ this.props.chatBody.messages }
 	    	/>
         <ChatTextInputBar/>
     	</div>
@@ -43,7 +25,13 @@ class FriendChatView extends React.Component {
 }
 
 FriendChatView.propTypes = {
-  classes: PropTypes.object.isRequired,
+  chatHeader: PropTypes.object,
+  chatBody: PropTypes.object, 
+  menuButtonClickCallback: PropTypes.func,
 };
 
-export default withStyles(styles)(FriendChatView);
+FriendChatView.defaultProps = {
+  menuButtonClickCallback: (() => {}),
+}
+
+export default FriendChatView;

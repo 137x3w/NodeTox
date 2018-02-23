@@ -2,75 +2,69 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
-import List, { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader } from 'material-ui/List';
+import List, { ListItem, ListItemIcon, ListSubheader } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
-import FingerprintIcon from 'material-ui-icons/Fingerprint';
-import ShortTextIcon from 'material-ui-icons/ShortText';
 import Avatar from 'material-ui/Avatar';
 import ButtonBase from 'material-ui/ButtonBase';
 
 const styles = theme => ({
-  ProfileSettingsBodyBody: {
+  profileSettingsBodyBody: {
     height: 'calc(100vh - 80px)',
     overflow: 'auto',
   },
-  ProfileSettingsBodyAvatar: {
+  profileSettingsBodyAvatar: {
     cursor: 'pointer',
   },
-  ProfileSettingsBodyIcon: {
+  profileSettingsBodyIcon: {
     width: '40px',
     height: '40px',
   },
-  ProfileSettingsBodyToxid: {
+  profileSettingsBodyToxid: {
     flex: 1,
   },
+  saveButton: {
+    justifyContent: 'flex-end',
+  }
 });
 
 class ProfileSettingsBody extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.classes = props.classes;
-  }
-
-  handleProps(props) {
-    var result = {
-      nickname: props.nickname || "",
-      statusMessage: props.statusMessage || "",
-      toxid: props.toxid || "",
-      profilePassword: props.profilePassword || "",
-      avatarSrc: props.avatarSrc || "",
-    };
-    return result;
   }
   
   render() {
-    this.safeProps = this.handleProps(this.props);
     return (    
-      <Grid item className={ this.classes.ProfileSettingsBodyBody }>
-        <List subheader={<ListSubheader disableSticky>Public</ListSubheader>}>
+      <Grid item className={ this.classes.profileSettingsBodyBody }>
+        <List>
+          <ListItem className={ this.classes.saveButton }>
+            <Button color="secondary" >
+              Save
+            </Button>
+          </ListItem>
+          <ListSubheader disableSticky>
+            Public
+          </ListSubheader>
           <ListItem>
-            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
+            <ListItemIcon className={ this.classes.profileSettingsBodyIcon }>
               <ButtonBase centerRipple>
-                <Avatar className={ this.classes.ProfileSettingsBodyAvatar } alt="User avatar" src={ this.safeProps.avatarSrc }>
-                  { this.safeProps.avatarSrc ? null : this.safeProps.nickname.charAt(0) }
+                <Avatar className={ this.classes.profileSettingsBodyAvatar } alt="User avatar" src={ this.props.avatarSrc }>
+                  { this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
                 </Avatar>
               </ButtonBase>
             </ListItemIcon>
             <TextField
-              defaultValue={ this.safeProps.nickname }
+              defaultValue={ this.props.nickname }
               label="Name"
               fullWidth
             />
           </ListItem>
           <ListItem>
-            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
-              <ShortTextIcon/>
-            </ListItemIcon>
+
             <TextField              
-              defaultValue={ this.safeProps.statusMessage }
+              defaultValue={ this.props.statusMessage }
               label="Status"
               fullWidth
             />
@@ -79,11 +73,8 @@ class ProfileSettingsBody extends React.Component {
             Tox ID
           </ListSubheader>
           <ListItem>
-            <ListItemIcon className={ this.classes.ProfileSettingsBodyIcon }>
-              <FingerprintIcon/>
-            </ListItemIcon>
-            <Typography noWrap variant="subheading" className={ this.classes.ProfileSettingsBodyToxid }>
-              { this.safeProps.toxid }
+            <Typography noWrap variant="subheading" className={ this.classes.profileSettingsBodyToxid }>
+              { this.props.toxid }
             </Typography>
             <Button>
               QR Image
@@ -97,6 +88,19 @@ class ProfileSettingsBody extends React.Component {
 
 ProfileSettingsBody.propTypes = {
   classes: PropTypes.object.isRequired,
+  nickname: PropTypes.string,
+  statusMessage: PropTypes.string,
+  toxid: PropTypes.string,
+  profilePassword: PropTypes.string,
+  avatarSrc: PropTypes.string,
 };
+
+ProfileSettingsBody.defaultProps = {
+  nickname: "Default nickname",
+  statusMessage: "Default status message",
+  toxid: "Default toxid",
+  profilePassword: "",
+  avatarSrc: "",
+}
 
 export default withStyles(styles)(ProfileSettingsBody);
