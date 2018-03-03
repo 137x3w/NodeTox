@@ -8,6 +8,7 @@ const styles = theme => ({
   profileBarContainer: {
     overflow: 'hidden',
     backgroundColor: theme.palette.primary.main,
+    minHeight: '77px',
   },
 });
 
@@ -21,10 +22,11 @@ class ProfileBar extends React.Component {
     return (
       <Grid item align="center" className={ this.classes.profileBarContainer }>
         <ContactListItem
-          nickname={ this.props.nickname }
-          statusMessage={ this.props.statusMessage }
-          avatarSrc={ this.props.avatarSrc }
-          connectionStatus={ this.props.connectionStatus }
+          nickname={ this.props.profileBar.nickname }
+          statusMessage={ this.props.profileBar.statusMessage }
+          avatarSrc={ this.props.profileBar.avatarSrc }
+          userStatus={ this.props.profileBar.userStatus }
+          connectionStatus={ this.props.profileBar.connectionStatus }
           clickCallback={ this.props.clickCallback }
         />
       </Grid>
@@ -34,18 +36,24 @@ class ProfileBar extends React.Component {
 
 ProfileBar.propTypes = {
   classes: PropTypes.object.isRequired,
-  avatarSrc: PropTypes.string,
-  nickname: PropTypes.string,
-  statusMessage: PropTypes.string,
-  connectionStatus: PropTypes.string,
+  profileBar: PropTypes.shape({
+    nickname: PropTypes.string,
+    statusMessage: PropTypes.string,
+    avatarSrc: PropTypes.string,
+    userStatus: PropTypes.number,
+    connectionStatus: PropTypes.bool,
+  }),
   clickCallback: PropTypes.func,
 };
 
 ProfileBar.defaultProps = {
-  avatarSrc: "",
-  nickname: "Default nickname",
-  statusMessage: "Default status message",
-  connectionStatus: "offline",
+  profileBar: {
+    nickname: "",
+    statusMessage: "",
+    avatarSrc: "",
+    userStatus: 0,
+    connectionStatus: false,
+  },
   clickCallback: (() => {}),
 }
 

@@ -20,6 +20,22 @@ class ChatTextInputBar extends React.Component {
   constructor(props) {
     super(props);
     this.classes = props.classes;
+    this.state = {
+      message: "",
+    }
+    this.handleSendMessage = this.handleSendMessage.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleSendMessage = function() {
+    this.props.sendMessageCallback(this.state.message);
+  }
+
+  handleInputChange = function(event) {
+    var value = event.target.value;
+    this.setState({
+      message: value
+    })
   }
   
   render() {
@@ -27,12 +43,23 @@ class ChatTextInputBar extends React.Component {
       <Grid item>
         <AppBar position="static" elevation={2}>
           <Toolbar className={ this.classes.chatTextInputBarToolBar }>            
-            <Input margin='dense' multiline fullWidth rows="2" endAdornment={
-              <InputAdornment position="end">
+            <Input 
+              margin='dense'
+              multiline
+              fullWidth
+              rows="3"
+              value={ this.state.message }
+              onChange={ this.handleInputChange }
+              endAdornment={
+                <InputAdornment position="end">
                   <IconButton color="primary" aria-label="Smiles">
                     <FaceIcon/>
                   </IconButton>
-                  <IconButton color="primary" aria-label="Send">
+                  <IconButton 
+                    color="primary" 
+                    aria-label="Send"
+                    onClick={ this.handleSendMessage }
+                  >
                     <SendIcon/>
                   </IconButton>
                 </InputAdornment>
@@ -47,6 +74,11 @@ class ChatTextInputBar extends React.Component {
 
 ChatTextInputBar.propTypes = {
   classes: PropTypes.object.isRequired,
+  sendMessageCallback: PropTypes.func,
 };
+
+ChatTextInputBar.defaultProps = {
+  sendMessageCallback: ((newMessage) => {})
+}
 
 export default withStyles(styles)(ChatTextInputBar);

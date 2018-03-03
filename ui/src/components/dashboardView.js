@@ -22,15 +22,22 @@ class DashboardView extends React.Component {
     return (
     	<div>
         <DashboardHeader 
+          contactsClickCallback={ this.props.contactsClickCallback }
           tabClickCallback={ this.tabClickCallback }
-          contactsTabClickCallback={ this.props.contactsTabClickCallback }
         />
         <DashboardBody 
           renderIndex={ this.state.tabIndex }
-          friendsControl={ this.props.dashboardBody.friendsControl }
-          groupsControl={ this.props.dashboardBody.groupsControl }
+        
           filesControl={ this.props.dashboardBody.filesControl }
+
+          friendsControl={ this.props.dashboardBody.friendsControl }
+          friendsControlCallbacks={ this.props.dashboardBody.friendsControlCallbacks }
+
+          groupsControl={ this.props.dashboardBody.groupsControl }
+          groupsControlCallbacks={ this.props.dashboardBody.groupsControlCallbacks }
+
           settings={ this.props.dashboardBody.settings }
+          settingsCallbacks={ this.props.dashboardBody.settingsCallbacks }
         />
     	</div>
     );
@@ -39,10 +46,12 @@ class DashboardView extends React.Component {
 
 DashboardView.propTypes = {
   contactsTabClickCallback: PropTypes.func,
+  dashboardBody: PropTypes.object,
 };
 
 DashboardView.defaultProps = {
   contactsTabClickCallback: (() => {}),
+  dashboardBody: {},
 }
 
 export default DashboardView;

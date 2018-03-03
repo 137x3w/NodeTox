@@ -1,22 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
 import ProfileBar from './profileBar';
 import ContactListBar from './contactListBar';
 
+const styles = theme => ({
+  fullHeight: {
+    // height: '100%',
+  },
+});
+
 class SideView extends React.Component {
+	constructor(props) {
+    super(props);
+    this.classes = props.classes;
+  }
   render() {
     return (
-    	<div>
-	    	<ProfileBar 
-	        nickname={ this.props.profileBar.nickname }
-		      statusMessage={ this.props.profileBar.statusMessage }
-		      avatarSrc={ this.props.profileBar.avatarSrc }
-		      connectionStatus={ this.props.profileBar.connectionStatus }
-		      clickCallback={ this.props.profileBarClickCallback }
+    	<div className={ this.classes.fullHeight }>
+	    	<ProfileBar
+	    		profileBar={ this.props.profileBar } 
+				clickCallback={ this.props.profileBarClickCallback }
 	    	/>
 	    	<ContactListBar
-	        contacts={ this.props.contactList.contacts }
-	      	contactClickCallback={ this.props.contactListItemClickCallback }
+		        contacts={ this.props.contactList.contacts }
+		      	contactClickCallback={ this.props.contactListItemClickCallback }
 	    	/>
     	</div>
     );
@@ -33,4 +41,4 @@ SideView.defaultProps = {
 	profileBarClickCallback: (() => {}),
 }
 
-export default SideView;
+export default withStyles(styles)(SideView);

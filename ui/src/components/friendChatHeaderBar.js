@@ -55,6 +55,7 @@ class FriendChatHeaderBar extends React.Component {
                   src={ this.props.avatarSrc }
                   char={ this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
                   connectionStatus={ this.props.connectionStatus }
+                  userStatus={ this.props.userStatus }
                 />
               }
             />
@@ -78,18 +79,22 @@ class FriendChatHeaderBar extends React.Component {
 
 FriendChatHeaderBar.propTypes = {
   classes: PropTypes.object.isRequired,
+  friendUid: PropTypes.string,
   nickname: PropTypes.string,
   statusMessage: PropTypes.string,
   avatarSrc: PropTypes.string,
-  connectionStatus: PropTypes.string,
+  connectionStatus: PropTypes.bool,
+  userStatus: PropTypes.number,
   menuButtonClickCallback: PropTypes.func,
 };
 
 FriendChatHeaderBar.defaultProps = {
-  nickname: "Default nickname",
-  statusMessage: "Default status message",
+  friendUid: "",
+  nickname: "",
+  statusMessage: "",
   avatarSrc: "",
-  connectionStatus: "offline",
+  userStatus: 0,
+  connectionStatus: false,
   menuButtonClickCallback: (() => {}),
 }
 
