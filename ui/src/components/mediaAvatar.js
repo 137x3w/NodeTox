@@ -41,9 +41,9 @@ const styles = theme => ({
 
   },
   contactListStyle: {
-    width: '50px',
-    height: '50px',
-    margin: '10px',
+    // width: '50px',
+    // height: '50px',
+    // margin: '10px',
     backgroundColor: theme.palette.secondary.main,
   }
 });
@@ -54,13 +54,30 @@ class MediaAvatar extends React.Component {
     this.classes = props.classes;
   }
 
+  getStyleNameByConnectionStatus = function(connectionStatus, userStatus) {
+    if(connectionStatus) {
+      switch(userStatus) {
+        case 0: 
+          return "none";
+        case 1:
+          return "away";
+        case 2:
+          return "busy";
+        default:
+          return "none";
+      }
+    } else {
+      return "offline";
+    }
+  }
+
   render() {
     return (
       <div className={
         classnames(this.classes.avatarContainer, 
-                   this.classes[this.props.connectionStatus + 'ConnectionStatus'])
+                   this.classes[this.getStyleNameByConnectionStatus(this.props.connectionStatus, this.props.userStatus) + 'ConnectionStatus'])
       }>
-  			<Avatar alt="User avatar" src={ this.props.src } className={this.classes[this.props.styleType + 'Style']}>
+  			<Avatar src={ this.props.src } className={this.classes[this.props.styleType + 'Style']}>
           { this.props.src ? null : this.props.char }
         </Avatar>
       </div>
@@ -72,14 +89,16 @@ MediaAvatar.propTypes = {
   classes: PropTypes.object.isRequired,
   src: PropTypes.string,
   char: PropTypes.string,
-  connectionStatus: PropTypes.string,
+  userStatus: PropTypes.number,
+  connectionStatus: PropTypes.bool,
   styleType: PropTypes.string,
 };
 
 MediaAvatar.defaultProps = {
   src: "",
   char: "A",
-  connectionStatus: "offline",
+  userStatus: 0,
+  connectionStatus: false,
   styleType: "default",
 }
 

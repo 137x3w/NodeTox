@@ -128,8 +128,8 @@ class App extends React.Component {
     }));
   }
 
-  contactClickCallback(uid) {
-    this.props.newFriendChatView(uid);
+  contactClickCallback(friendUid) {
+    this.props.handleOpenFriendChatView(friendUid);
     this.setState((prevState, props) => ({
       render: {
         default: {
@@ -152,35 +152,33 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={theme}>
         <Grid container spacing={0} className={ this.classes.appSceleton }>
-          <Grid item hidden={{ mdUp: true }} xs={12}>
-            { this.state.render.small.sideBar &&
-              (
+          { this.state.render.small.sideBar &&
+            (
+              <Grid item hidden={{ mdUp: true }} xs={12}>
                 <SideView
                   profileBar={ this.props.view.sideView.profileBar }
                   profileBarClickCallback={ this.profileBarClickCallback }
                   contactList={ this.props.view.sideView.contactList }
                   contactListItemClickCallback={ this.contactClickCallback }
                 /> 
-              )
-            }
-          </Grid>
-          <Grid item hidden={{ smDown: true }} md={4} lg={3}>
-            { this.state.render.default.sideBar &&
-              (
+              </Grid>
+            )
+          }
+          { this.state.render.default.sideBar &&
+            (<Grid item hidden={{ smDown: true }} md={4} lg={3}>
                 <SideView
                   profileBar={ this.props.view.sideView.profileBar }
                   profileBarClickCallback={ this.profileBarClickCallback }
                   contactList={ this.props.view.sideView.contactList }
                   contactListItemClickCallback={ this.contactClickCallback }
                 />
-              ) 
-            }
-          </Grid>
-          <Grid item hidden={{ mdUp: true }} xs={12} className={ this.classes.mainBar }>
+            </Grid>)
+          }
+          <Grid item hidden={{ mdUp: true }} xs={12}>
             { this.state.render.small.dashboard && 
               (
                 <DashboardView
-                  contactsTabClickCallback={ this.contactsTabClickCallbackSm }
+                  contactsClickCallback={ this.contactsTabClickCallbackSm }
                   dashboardBody={ this.props.view.dashboardView.body }
                 />
               ) 
@@ -188,9 +186,8 @@ class App extends React.Component {
             { this.state.render.small.friendChat && 
               (
                 <FriendChatView
-                  chatHeader={ this.props.view.friendChatView.header }
+                  friendChatView={ this.props.view.friendChatView }
                   menuButtonClickCallback={ this.friendChatMenuButtonClickCallback }
-                  chatBody={ this.props.view.friendChatView.body }
                 />
               ) 
             }
@@ -204,11 +201,11 @@ class App extends React.Component {
               ) 
             }
           </Grid>
-          <Grid item hidden={{ smDown: true }} md={8} lg={9} className={ this.classes.mainBar }>
+          <Grid item hidden={{ smDown: true }} md={8} lg={9}>
             { this.state.render.default.dashboard && 
               (
                 <DashboardView
-                  contactsTabClickCallback={ this.contactsTabClickCallbackSm }
+                  contactsClickCallback={ this.contactsTabClickCallbackSm }
                   dashboardBody={ this.props.view.dashboardView.body }
                 />
               ) 
@@ -216,9 +213,8 @@ class App extends React.Component {
             { this.state.render.default.friendChat && 
               (
                 <FriendChatView
-                  chatHeader={ this.props.view.friendChatView.header }
+                  friendChatView={ this.props.view.friendChatView }
                   menuButtonClickCallback={ this.friendChatMenuButtonClickCallback }
-                  chatBody={ this.props.view.friendChatView.body }
                 />
               ) 
             }
@@ -240,11 +236,12 @@ class App extends React.Component {
 
 App.propTypes = {
   classes: PropTypes.object.isRequired,
-  newFriendChatView: PropTypes.func,
+  view: PropTypes.object,
+  handleOpenFriendChatView: PropTypes.func,
 };
 
 App.defaultProps = {
-  newFriendChatView: (() => {}),
+  handleOpenFriendChatView: ((friendUid) => {}),
 };
 
 export default withStyles(styles)(App);

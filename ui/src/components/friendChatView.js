@@ -9,24 +9,27 @@ class FriendChatView extends React.Component {
     return (
     	<div>
         <FriendChatHeader
-          avatarSrc={ this.props.chatHeader.avatarSrc } 
-          nickname={ this.props.chatHeader.nickname }
-          statusMessage={ this.props.chatHeader.statusMessage }
-          connectionStatus={ this.props.chatHeader.connectionStatus }
+          friendUid={ this.props.friendChatView.header.friendUid }
+          avatarSrc={ this.props.friendChatView.header.avatarSrc } 
+          nickname={ this.props.friendChatView.header.nickname }
+          statusMessage={ this.props.friendChatView.header.statusMessage }
+          connectionStatus={ this.props.friendChatView.header.connectionStatus }
+          userStatus={ this.props.friendChatView.header.userStatus }
           menuButtonClickCallback={ this.props.menuButtonClickCallback }
         />
 	    	<ChatBodyBar
-	        messages={ this.props.chatBody.messages }
+	        messages={ this.props.friendChatView.body.messages }
 	    	/>
-        <ChatTextInputBar/>
+        <ChatTextInputBar
+          sendMessageCallback={ this.props.friendChatView.footer.sendMessageCallback }
+        />
     	</div>
     );
   }
 }
 
 FriendChatView.propTypes = {
-  chatHeader: PropTypes.object,
-  chatBody: PropTypes.object, 
+  friendChatView: PropTypes.object,
   menuButtonClickCallback: PropTypes.func,
 };
 

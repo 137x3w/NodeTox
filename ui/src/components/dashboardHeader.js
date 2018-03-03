@@ -22,7 +22,7 @@ const styles = theme => ({
   }
 });
 
-class ProfileSettingsHeader extends React.Component {
+class DashboardHeader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -57,7 +57,7 @@ class ProfileSettingsHeader extends React.Component {
               <Tab label="Friends" icon={<PersonIcon/>} className={ this.classes.tab }/>
               <Tab label="Groups" icon={<GroupIcon/>} className={ this.classes.tab }/>
               <Tab label="Contacts" icon={<ContactsIcon/>} className={ classnames(this.classes.tab, this.classes.contactsTab) }
-                onClick={ this.props.contactsTabClickCallback }
+                onClick={ this.props.contactsClickCallback }
               />
               <Tab label="Files" icon={<PermMediaIcon/>} className={ this.classes.tab }/>
               <Tab label="Settings" icon={<SettingsIcon/>} className={ this.classes.tab }/>
@@ -69,15 +69,19 @@ class ProfileSettingsHeader extends React.Component {
   }
 }
 
-ProfileSettingsHeader.propTypes = {
+DashboardHeader.propTypes = {
   classes: PropTypes.object.isRequired,
-  tabClickCallback: PropTypes.func,
-  contactsClickCallback: PropTypes.func,
+  callbacks: PropTypes.shape({
+    tabClickCallback: PropTypes.func,
+    contactsClickCallback: PropTypes.func,
+  }),
 };
 
-ProfileSettingsHeader.defaultProps = {
-  tabClickCallback: (() => {}),
-  contactsClickCallback: (() => {}),
-}
+DashboardHeader.defaultProps = {
+  callbacks: {
+    tabClickCallback: function() {},
+    contactsClickCallback: function() {},
+  }
+};
 
-export default withStyles(styles)(ProfileSettingsHeader);
+export default withStyles(styles)(DashboardHeader);

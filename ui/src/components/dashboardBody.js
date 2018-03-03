@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
-import ProfileSettingsBody from './profileSettingsBody';
-import FriendsControlView from './friendsControlView';
-import GroupsControlView from './groupsControlView';
+import ProfileSettingsBody from './settingsView/profileSettingsBody';
+import FriendsControlView from './friendsControlView/friendsControlView';
+import GroupsControlView from './groupsControlView/groupsControlView';
 
 const styles = theme => ({
   dashboardBody: {
-    height: 'calc(100vh - 80px)',
+    height: 'calc(100vh - 72px)',
     overflow: 'auto',
   },
 });
@@ -19,7 +19,7 @@ class DashboardBody extends React.Component {
     this.classes = props.classes;
   }
 
-  render() {
+  render() { 
     return (    
       <Grid item className={ this.classes.dashboardBody }>
         {
@@ -28,18 +28,19 @@ class DashboardBody extends React.Component {
               case 0: return (
                 <FriendsControlView
                   requests={ this.props.friendsControl.friendRequests }
+                  callbacks={ this.props.friendsControlCallbacks }
                 />
               )
               case 1: return (
-                <GroupsControlView/>
+                <GroupsControlView
+                  requests={ this.props.groupsControl.groupRequests }
+                  callbacks={ this.props.groupsControlCallbacks }
+                />
               )
               case 4: return (
                 <ProfileSettingsBody
-                  nickname={ this.props.settings.nickname }
-                  statusMessage={ this.props.settings.statusMessage }
-                  toxid={ this.props.settings.toxid }
-                  profilePassword={ this.props.settings.profilePassword }
-                  avatarSrc={ this.props.settings.avatarSrc }
+                  settings={ this.props.settings }
+                  callbacks={ this.props.settingsCallbacks }
                 />
               )
               default: return (

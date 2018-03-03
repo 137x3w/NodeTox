@@ -39,10 +39,21 @@ class RequestMessage extends React.Component {
   constructor(props) {
     super(props);
     this.classes = props.classes;
+
+    this.handleAllowRequest = this.handleAllowRequest.bind(this);
+    this.handleDenyRequest = this.handleDenyRequest.bind(this);
   }
 
   formatTime(unixTime) {
     return unixTime;
+  }
+
+  handleAllowRequest = function() {
+    this.props.allowRequestCallback(this.props.uid);
+  }
+
+  handleDenyRequest = function() {
+    this.props.denyRequestCallback(this.props.uid);
   }
   
   render() {
@@ -63,10 +74,16 @@ class RequestMessage extends React.Component {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button color="secondary">
+              <Button 
+                color="secondary"
+                onClick={ this.handleAllowRequest }
+              >
                 Allow
               </Button>
-              <Button color="secondary">
+              <Button 
+                color="secondary"
+                onClick={ this.handleDenyRequest }
+              >
                 Deny
               </Button>
             </CardActions>
@@ -80,15 +97,21 @@ class RequestMessage extends React.Component {
 
 RequestMessage.propTypes = {
   classes: PropTypes.object.isRequired,
+  uid: PropTypes.string,
   nickname: PropTypes.string,
   message: PropTypes.string,
   time: PropTypes.number,
+  allowRequestCallback: PropTypes.func,
+  denyRequestCallback: PropTypes.func,
 };
 
 RequestMessage.defaultProps = {
+  uid: "0",
   nickname: "Default nickname",
   message: "Default message",
   time: 0,
+  allowRequestCallback: (() => {}),
+  denyRequestCallback: (() => {}),
 }
 
 export default withStyles(styles)(RequestMessage);

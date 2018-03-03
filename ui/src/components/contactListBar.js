@@ -9,7 +9,7 @@ const styles = theme => ({
   contactsListBar: {
     overflow: 'auto',
     minHeight: '120px',
-    height: 'calc(100vh - 87px)',
+    height: 'calc(100vh - 77px)',
     backgroundColor: theme.palette.primary.main,
   },
 });
@@ -33,6 +33,7 @@ class ContactListBar extends React.Component {
                 statusMessage={item.statusMessage}
                 avatarSrc={item.avatarSrc}
                 connectionStatus={item.connectionStatus}
+                userStatus={item.userStatus}
                 unreadMessagesCount={item.unreadMessagesCount}
                 clickCallback={this.props.contactClickCallback}
               />

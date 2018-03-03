@@ -10,6 +10,8 @@ const styles = theme => ({
   contactListItem: {
     overflow: 'auto',
     paddingRight: '32px',
+    paddingTop: '16px',
+    paddingBottom: '16px',
     background: theme.palette.primary.main,
   },
   contactListItemNickname: {
@@ -34,11 +36,12 @@ class ContactListItem extends React.Component {
   
   render() {
     return (    
-      <ListItem button divider className={this.classes.contactListItem} onClick={ this.listItemClicked }>
+      <ListItem button className={this.classes.contactListItem} onClick={ this.listItemClicked }>
         <ListItemAvatar>
           <MediaAvatar
             src={ this.props.avatarSrc }
             char={ this.props.avatarSrc ? null : this.props.nickname.charAt(0) }
+            userStatus={ this.props.userStatus }
             connectionStatus={ this.props.connectionStatus }
             styleType="contactList"
           />
@@ -67,23 +70,23 @@ class ContactListItem extends React.Component {
 
 ContactListItem.propTypes = {
   classes: PropTypes.object.isRequired,
+  uid: PropTypes.string,
   nickname: PropTypes.string,
   statusMessage: PropTypes.string,
   avatarSrc: PropTypes.string,
-  connectionStatus: PropTypes.string,
-  unreadMessagesCount: PropTypes.number,
+  userStatus: PropTypes.number,
+  connectionStatus: PropTypes.bool,
   clickCallback: PropTypes.func,
-  uid: PropTypes.string,
 };
 
 ContactListItem.defaultProps = {
-  nickname: "Default nickname",
-  statusMessage: "Default status message",
-  avatarSrc: "",
-  connectionStatus: "offline",
-  unreadMessagesCount: 0,
-  clickCallback: (() => {}),
   uid: "0",
+  nickname: "",
+  statusMessage: "",
+  avatarSrc: "",
+  userStatus: 0,
+  connectionStatus: false,
+  clickCallback: (() => {}),
 }
 
 export default withStyles(styles)(ContactListItem);
