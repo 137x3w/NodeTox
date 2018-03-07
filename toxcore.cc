@@ -4,16 +4,35 @@
  */
 
 #include "toxcore.h"
-
 #include <tox/tox.h>
+
+#include <iostream>
 
 Napi::FunctionReference ToxCore::constructor;
 
 Napi::Object ToxCore::Init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
 
-    Napi::Function func = DefineClass(env, "ToxCore", {
-        InstanceMethod("bindCallbacks", &ToxCore::bindCallbacks),
+    Napi::Function func = DefineClass(env, "ToxCore", {    
+
+        InstanceMethod("updateToxCallbackSelfConnectionStatus", &ToxCore::updateToxCallbackSelfConnectionStatus),
+        InstanceMethod("updateToxCallbackFriendName", &ToxCore::updateToxCallbackFriendName),
+        InstanceMethod("updateToxCallbackFriendStatusMessage", &ToxCore::updateToxCallbackFriendStatusMessage),
+        InstanceMethod("updateToxCallbackFriendStatus", &ToxCore::updateToxCallbackFriendStatus),
+        InstanceMethod("updateToxCallbackFriendConnectionStatus", &ToxCore::updateToxCallbackFriendConnectionStatus),
+        InstanceMethod("updateToxCallbackFriendTyping", &ToxCore::updateToxCallbackFriendTyping),
+        InstanceMethod("updateToxCallbackFriendReadReceipt", &ToxCore::updateToxCallbackFriendReadReceipt),
+        InstanceMethod("updateToxCallbackFriendRequest", &ToxCore::updateToxCallbackFriendRequest),
+        InstanceMethod("updateToxCallbackFriendMessage", &ToxCore::updateToxCallbackFriendMessage),
+        InstanceMethod("updateToxCallbackFileRecvControl", &ToxCore::updateToxCallbackFileRecvControl),
+        InstanceMethod("updateToxCallbackFileChunkRequest", &ToxCore::updateToxCallbackFileChunkRequest),
+        InstanceMethod("updateToxCallbackFileRecv", &ToxCore::updateToxCallbackFileRecv),
+        InstanceMethod("updateToxCallbackFileRecvChunk", &ToxCore::updateToxCallbackFileRecvChunk),
+        InstanceMethod("updateToxCallbackConferenceInvite", &ToxCore::updateToxCallbackConferenceInvite),
+        InstanceMethod("updateToxCallbackConferenceMessage", &ToxCore::updateToxCallbackConferenceMessage),
+        InstanceMethod("updateToxCallbackConferenceTitle", &ToxCore::updateToxCallbackConferenceTitle),
+        InstanceMethod("updateToxCallbackFriendLossyPacket", &ToxCore::updateToxCallbackFriendLossyPacket),
+        InstanceMethod("updateToxCallbackFriendLosslessPacket", &ToxCore::updateToxCallbackFriendLosslessPacket),        
 
         InstanceMethod("toxVersionMajor", &ToxCore::toxVersionMajor),
         InstanceMethod("toxVersionMinor", &ToxCore::toxVersionMinor),
@@ -140,7 +159,6 @@ Napi::Object ToxCore::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("toxCallbackConferenceInvite", &ToxCore::toxCallbackConferenceInvite),
         InstanceMethod("toxCallbackConferenceMessage", &ToxCore::toxCallbackConferenceMessage),
         InstanceMethod("toxCallbackConferenceTitle", &ToxCore::toxCallbackConferenceTitle),
-        InstanceMethod("toxCallbackConferenceNamelistChange", &ToxCore::toxCallbackConferenceNamelistChange),
         InstanceMethod("toxConferenceNew", &ToxCore::toxConferenceNew),
         InstanceMethod("toxConferenceDelete", &ToxCore::toxConferenceDelete),
         InstanceMethod("toxConferencePeerCount", &ToxCore::toxConferencePeerCount),
@@ -180,25 +198,6 @@ ToxCore::ToxCore(const Napi::CallbackInfo &info) : Napi::ObjectWrap<ToxCore>(inf
 {
     toxOptions = 0;
     tox = 0;
-    selfConnectionStatusAsyncWorker = 0;
-    friendNameAsyncWorker = 0;
-    friendStatusMessageAsyncWorker = 0;
-    friendStatusAsyncWorker = 0;
-    friendConnectionStatusAsyncWorker = 0;
-    friendTypingAsyncWorker = 0;
-    friendReadReceiptAsyncWorker = 0;
-    friendRequestAsyncWorker = 0;
-    friendMessageAsyncWorker = 0;
-    fileRecvControlAsyncWorker = 0;
-    fileChunkRequestAsyncWorker = 0;
-    fileRecvAsyncWorker = 0;
-    fileRecvChunkAsyncWorker = 0;
-    conferenceInviteAsyncWorker = 0;
-    conferenceMessageAsyncWorker = 0;
-    conferenceTitleAsyncWorker = 0;
-    conferenceNamelistChangeAsyncWorker = 0;
-    friendLossyPacketAsyncWorker = 0;
-    friendLosslessPacketAsyncWorker = 0;
 }
 
 /*  
@@ -226,27 +225,94 @@ void ToxCore::convertFromUint32_t2Uint64_t(const uint32_t* source, uint64_t* res
     *result = ((uint64_t)source[1] << 32) + source[0];
 }
 
-void ToxCore::bindCallbacks(const Napi::CallbackInfo& info)
+void ToxCore::updateToxCallbackSelfConnectionStatus(const Napi::CallbackInfo& info)
 {
-    // tox_callback_self_connection_status(tox, _selfConnectionStatusChanged);
-    // tox_callback_friend_name(tox, _friendNameChanged);
-    // tox_callback_friend_status_message(tox, _friendStatusMessageChanged);
-    // tox_callback_friend_status(tox, _friendStatusChanged);
-    // tox_callback_friend_connection_status(tox, _friendConnectionStatusChanged);
-    // tox_callback_friend_typing(tox, _friendTypingChanged);
-    // tox_callback_friend_read_receipt(tox, _friendReadReceiptChanged);
-    // tox_callback_friend_request(tox, _friendRequestChanged);
-    // tox_callback_friend_message(tox, _friendMessageChanged);
-    // tox_callback_file_recv_control(tox, _fileRecvControlChanged);
-    // tox_callback_file_chunk_request(tox, _fileChunkRequestChanged);
-    // tox_callback_file_recv(tox, _fileRecvChanged);
-    // tox_callback_file_recv_chunk(tox, _fileRecvChunkChanged);
-    // tox_callback_conference_invite(tox, _conferenceInviteChanged);
-    // tox_callback_conference_message(tox, _conferenceMessageChanged);
-    // tox_callback_conference_title(tox, _conferenceTitleChanged);
-    // tox_callback_conference_namelist_change(tox, _conferenceNamelistChangeChanged);
-    // tox_callback_friend_lossy_packet(tox, _friendLossyPacketChanged);
-    // tox_callback_friend_lossless_packet(tox, _friendLosslessPacketChanged);
+    tox_callback_self_connection_status(tox, _selfConnectionStatusChanged);
+}
+
+void ToxCore::updateToxCallbackFriendName(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_name(tox, _friendNameChanged);
+}
+
+void ToxCore::updateToxCallbackFriendStatusMessage(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_status_message(tox, _friendStatusMessageChanged);
+}
+
+void ToxCore::updateToxCallbackFriendStatus(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_status(tox, _friendStatusChanged);
+}
+
+void ToxCore::updateToxCallbackFriendConnectionStatus(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_connection_status(tox, _friendConnectionStatusChanged);
+}
+
+void ToxCore::updateToxCallbackFriendTyping(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_typing(tox, _friendTypingChanged);
+}
+
+void ToxCore::updateToxCallbackFriendReadReceipt(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_read_receipt(tox, _friendReadReceiptChanged);
+}
+
+void ToxCore::updateToxCallbackFriendRequest(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_request(tox, _friendRequestChanged);
+}
+
+void ToxCore::updateToxCallbackFriendMessage(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_message(tox, _friendMessageChanged);
+}
+
+void ToxCore::updateToxCallbackFileRecvControl(const Napi::CallbackInfo& info)
+{
+    tox_callback_file_recv_control(tox, _fileRecvControlChanged);
+}
+
+void ToxCore::updateToxCallbackFileChunkRequest(const Napi::CallbackInfo& info)
+{
+    tox_callback_file_chunk_request(tox, _fileChunkRequestChanged);
+}
+
+void ToxCore::updateToxCallbackFileRecv(const Napi::CallbackInfo& info)
+{
+    tox_callback_file_recv(tox, _fileRecvChanged);
+}
+
+void ToxCore::updateToxCallbackFileRecvChunk(const Napi::CallbackInfo& info)
+{
+    tox_callback_file_recv_chunk(tox, _fileRecvChunkChanged);
+}
+
+void ToxCore::updateToxCallbackConferenceInvite(const Napi::CallbackInfo& info)
+{
+    tox_callback_conference_invite(tox, _conferenceInviteChanged);
+}
+
+void ToxCore::updateToxCallbackConferenceMessage(const Napi::CallbackInfo& info)
+{
+    tox_callback_conference_message(tox, _conferenceMessageChanged);
+}
+
+void ToxCore::updateToxCallbackConferenceTitle(const Napi::CallbackInfo& info)
+{
+    tox_callback_conference_title(tox, _conferenceTitleChanged);
+}
+
+void ToxCore::updateToxCallbackFriendLossyPacket(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_lossy_packet(tox, _friendLossyPacketChanged);
+}
+
+void ToxCore::updateToxCallbackFriendLosslessPacket(const Napi::CallbackInfo& info)
+{
+    tox_callback_friend_lossless_packet(tox, _friendLosslessPacketChanged);
 }
 
 /*
@@ -451,6 +517,9 @@ void ToxCore::toxOptionsSetProxyType(const Napi::CallbackInfo& info)
 
 Napi::Value ToxCore::toxOptionsGetProxyHost(const Napi::CallbackInfo& info)
 {
+    std::cout << toxOptions << std::endl;
+    std::cout << tox_options_get_proxy_host(toxOptions) << std::endl;
+    
     return Napi::String::New(info.Env(), tox_options_get_proxy_host(toxOptions));
 }
 
@@ -636,13 +705,20 @@ void ToxCore::toxOptionsSetSavedataData(const Napi::CallbackInfo& info)
         return;
     }
 
-    if (!info[0].IsArrayBuffer()) {
+    if (!info[0].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return;
     }
 
-    size_t length = (size_t)info[0].As<Napi::ArrayBuffer>().ByteLength();
-    tox_options_set_savedata_data(toxOptions, (uint8_t*)info[0].As<Napi::ArrayBuffer>().Data(), length);
+    Napi::TypedArray info0TypedArray = info[0].As<Napi::TypedArray>();
+    if (info0TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
+        return;
+    }
+
+    Napi::Uint8Array data = info0TypedArray.As<Napi::Uint8Array>();
+    size_t length = (size_t)data.ByteLength();
+    tox_options_set_savedata_data(toxOptions, (uint8_t*)data.Data(), length);
 }
 
 Napi::Value ToxCore::toxOptionsGetSavedataLength(const Napi::CallbackInfo& info)
@@ -828,17 +904,19 @@ Napi::Value ToxCore::toxAddTcpRelay(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackSelfConnectionStatus(const Napi::CallbackInfo& info)
 {
-    if(selfConnectionStatusAsyncWorker != 0) {
-        delete selfConnectionStatusAsyncWorker;
-    }
-    selfConnectionStatusAsyncWorker = new SelfConnectionStatusAsyncWorker(info[0].As<Napi::Function>());
+    // if(selfConnectionStatusAsyncWorker != 0) {
+    //     delete selfConnectionStatusAsyncWorker;
+    // }
+    // selfConnectionStatusAsyncWorker = new SelfConnectionStatusAsyncWorker(info[0].As<Napi::Function>());
+    selfConnectionStatusCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_selfConnectionStatusChanged(Tox *tox, TOX_CONNECTION connection_status, void *user_data)
 {
+    // toxCore->selfConnectionStatusAsyncWorker->setModel(connection_status);
+    // toxCore->selfConnectionStatusAsyncWorker->Queue();
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->selfConnectionStatusAsyncWorker->setModel(connection_status);
-    toxCore->selfConnectionStatusAsyncWorker->Queue();
+    toxCore->selfConnectionStatusCallback.MakeCallback(toxCore->selfConnectionStatusCallback.Env().Global(), { Napi::Number::New(toxCore->selfConnectionStatusCallback.Env(), connection_status) });
 }
 
 Napi::Value ToxCore::toxSelfGetConnectionStatus(const Napi::CallbackInfo& info)
@@ -1084,29 +1162,23 @@ Napi::Value ToxCore::toxFriendAddNorequest(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 2) {
+    if (info.Length() != 1) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    if (!info[0].IsString() || !info[1].IsString()) {
+    if (!info[0].IsString()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    uint8_t* address = new uint8_t[TOX_ADDRESS_SIZE] { 0 };
-    convertFromChar2Uint8t(info[0].As<Napi::String>().Utf8Value().c_str(), address, TOX_ADDRESS_SIZE);
-
-    size_t length = info[1].As<Napi::String>().Utf8Value().length();
-
-    uint8_t* message = new uint8_t[length] { 0 };
-    convertFromChar2Uint8t(info[1].As<Napi::String>().Utf8Value().c_str(), message, length);
+    uint8_t* public_key = new uint8_t[TOX_PUBLIC_KEY_SIZE] { 0 };
+    convertFromChar2Uint8t(info[0].As<Napi::String>().Utf8Value().c_str(), public_key, TOX_PUBLIC_KEY_SIZE);
 
     TOX_ERR_FRIEND_ADD error;
-    uint32_t returned = tox_friend_add(tox, address, message, length, &error);
+    uint32_t returned = tox_friend_add_norequest(tox, public_key, &error);
     
-    delete [] address;
-    delete [] message;
+    delete [] public_key;
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -1218,7 +1290,7 @@ Napi::Value ToxCore::toxSelfGetFriendList(const Napi::CallbackInfo& info)
     uint32_t* friend_list = new uint32_t[length] { 0 };
 
     tox_self_get_friend_list(tox, friend_list);
-    return Napi::ArrayBuffer::New(info.Env(), friend_list, length);
+    return Napi::ArrayBuffer::New(info.Env(), friend_list, length * 4);
 }
 
 Napi::Value ToxCore::toxFriendGetPublicKey(const Napi::CallbackInfo& info)
@@ -1275,7 +1347,7 @@ Napi::Value ToxCore::toxFriendGetLastOnline(const Napi::CallbackInfo& info)
     Napi::Object result = Napi::Object::New(env);
 
     result.Set(Napi::String::New(env, "error"), Napi::Number::New(env, error));
-    result.Set(Napi::String::New(env, "return"), Napi::ArrayBuffer::New(env, timestamp32_t, 2));
+    result.Set(Napi::String::New(env, "return"), Napi::ArrayBuffer::New(env, timestamp32_t, 2 * 4));
 
     return result;
 }
@@ -1344,17 +1416,22 @@ Napi::Value ToxCore::toxFriendGetName(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendName(const Napi::CallbackInfo& info)
 {
-    if(friendNameAsyncWorker != 0) {
-        delete friendNameAsyncWorker;
-    }
-    friendNameAsyncWorker = new FriendNameAsyncWorker(info[0].As<Napi::Function>());
+    // if(friendNameAsyncWorker != 0) {
+    //     delete friendNameAsyncWorker;
+    // }
+    // friendNameAsyncWorker = new FriendNameAsyncWorker(info[0].As<Napi::Function>());
+    friendNameCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendNameChanged(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendNameAsyncWorker->setModel(friend_number, name, length);
-    toxCore->friendNameAsyncWorker->Queue();
+    // toxCore->friendNameAsyncWorker->setModel(friend_number, name, length);
+    // toxCore->friendNameAsyncWorker->Queue();
+    toxCore->friendNameCallback.MakeCallback(toxCore->friendNameCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendNameCallback.Env(), friend_number), 
+        Napi::String::New(toxCore->friendNameCallback.Env(), (const char*)name, length)
+    });
 }
 
 Napi::Value ToxCore::toxFriendGetStatusMessageSize(const Napi::CallbackInfo& info)
@@ -1417,17 +1494,22 @@ Napi::Value ToxCore::toxFriendGetStatusMessage(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendStatusMessage(const Napi::CallbackInfo& info)
 {
-    if(friendStatusMessageAsyncWorker != 0) {
-        delete friendStatusMessageAsyncWorker;
-    }
-    friendStatusMessageAsyncWorker = new FriendStatusMessageAsyncWorker(info[0].As<Napi::Function>());
+    // if(friendStatusMessageAsyncWorker != 0) {
+    //     delete friendStatusMessageAsyncWorker;
+    // }
+    // friendStatusMessageAsyncWorker = new FriendStatusMessageAsyncWorker(info[0].As<Napi::Function>());
+    friendStatusMessageCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendStatusMessageChanged(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendStatusMessageAsyncWorker->setModel(friend_number, message, length);
-    toxCore->friendStatusMessageAsyncWorker->Queue();
+    // toxCore->friendStatusMessageAsyncWorker->setModel(friend_number, message, length);
+    // toxCore->friendStatusMessageAsyncWorker->Queue();
+    toxCore->friendStatusMessageCallback.MakeCallback(toxCore->friendStatusMessageCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendStatusMessageCallback.Env(), friend_number), 
+        Napi::String::New(toxCore->friendStatusMessageCallback.Env(), (const char*)message, length)
+    });
 }
 
 Napi::Value ToxCore::toxFriendGetStatus(const Napi::CallbackInfo& info)
@@ -1459,17 +1541,16 @@ Napi::Value ToxCore::toxFriendGetStatus(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendStatus(const Napi::CallbackInfo& info)
 {
-    if(friendStatusAsyncWorker != 0) {
-        delete friendStatusAsyncWorker;
-    }
-    friendStatusAsyncWorker = new FriendStatusAsyncWorker(info[0].As<Napi::Function>());
+    friendStatusCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendStatusChanged(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendStatusAsyncWorker->setModel(friend_number, status);
-    toxCore->friendStatusAsyncWorker->Queue();
+    toxCore->friendStatusCallback.MakeCallback(toxCore->friendStatusCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendStatusCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->friendStatusCallback.Env(), status) 
+    });
 }
 
 Napi::Value ToxCore::toxFriendGetConnectionStatus(const Napi::CallbackInfo& info)
@@ -1501,17 +1582,16 @@ Napi::Value ToxCore::toxFriendGetConnectionStatus(const Napi::CallbackInfo& info
 
 void ToxCore::toxCallbackFriendConnectionStatus(const Napi::CallbackInfo& info)
 {
-    if(friendConnectionStatusAsyncWorker != 0) {
-        delete friendConnectionStatusAsyncWorker;
-    }
-    friendConnectionStatusAsyncWorker = new FriendConnectionStatusAsyncWorker(info[0].As<Napi::Function>());
+    friendConnectionStatusCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendConnectionStatusChanged(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendConnectionStatusAsyncWorker->setModel(friend_number, connection_status);
-    toxCore->friendConnectionStatusAsyncWorker->Queue();
+    toxCore->friendConnectionStatusCallback.MakeCallback(toxCore->friendConnectionStatusCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendConnectionStatusCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->friendConnectionStatusCallback.Env(), connection_status) 
+    });
 }
 
 Napi::Value ToxCore::toxFriendGetTyping(const Napi::CallbackInfo& info)
@@ -1543,17 +1623,16 @@ Napi::Value ToxCore::toxFriendGetTyping(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendTyping(const Napi::CallbackInfo& info)
 {
-    if(friendTypingAsyncWorker != 0) {
-        delete friendTypingAsyncWorker;
-    }
-    friendTypingAsyncWorker = new FriendTypingAsyncWorker(info[0].As<Napi::Function>());
+    friendTypingCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendTypingChanged(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendTypingAsyncWorker->setModel(friend_number, is_typing);
-    toxCore->friendTypingAsyncWorker->Queue();
+    toxCore->friendTypingCallback.MakeCallback(toxCore->friendTypingCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendTypingCallback.Env(), friend_number), 
+        Napi::Boolean::New(toxCore->friendTypingCallback.Env(), is_typing) 
+    });
 }
 
 /*
@@ -1619,47 +1698,45 @@ Napi::Value ToxCore::toxFriendSendMessage(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendReadReceipt(const Napi::CallbackInfo& info)
 {
-    if(friendReadReceiptAsyncWorker != 0) {
-        delete friendReadReceiptAsyncWorker;
-    }
-    friendReadReceiptAsyncWorker = new FriendReadReceiptAsyncWorker(info[0].As<Napi::Function>());
+    friendReadReceiptCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendReadReceiptChanged(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendReadReceiptAsyncWorker->setModel(friend_number, message_id);
-    toxCore->friendReadReceiptAsyncWorker->Queue();
+    toxCore->friendReadReceiptCallback.MakeCallback(toxCore->friendReadReceiptCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendReadReceiptCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->friendReadReceiptCallback.Env(), message_id)
+    });
 }
 
 void ToxCore::toxCallbackFriendRequest(const Napi::CallbackInfo& info)
 {
-    if(friendRequestAsyncWorker != 0) {
-        delete friendRequestAsyncWorker;
-    }
-    friendRequestAsyncWorker = new FriendRequestAsyncWorker(info[0].As<Napi::Function>());
+    friendRequestCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendRequestChanged(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendRequestAsyncWorker->setModel(public_key, message, length);
-    toxCore->friendRequestAsyncWorker->Queue();
+    toxCore->friendRequestCallback.MakeCallback(toxCore->friendRequestCallback.Env().Global(), { 
+        Napi::ArrayBuffer::New(toxCore->friendRequestCallback.Env(), (void*)public_key, TOX_PUBLIC_KEY_SIZE),
+        Napi::String::New(toxCore->friendRequestCallback.Env(), (const char*)message, length) 
+    });
 }
 
 void ToxCore::toxCallbackFriendMessage(const Napi::CallbackInfo& info)
 {
-    if(friendMessageAsyncWorker != 0) {
-        delete friendMessageAsyncWorker;
-    }
-    friendMessageAsyncWorker = new FriendMessageAsyncWorker(info[0].As<Napi::Function>());
+    friendMessageCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendMessageChanged(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendMessageAsyncWorker->setModel(friend_number, type, message, length);
-    toxCore->friendMessageAsyncWorker->Queue();
+    toxCore->friendMessageCallback.MakeCallback(toxCore->friendMessageCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendMessageCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->friendMessageCallback.Env(), type), 
+        Napi::String::New(toxCore->friendMessageCallback.Env(), (const char*)message, length)
+    });
 }
 
 Napi::Value ToxCore::toxHash(const Napi::CallbackInfo& info)
@@ -1671,14 +1748,22 @@ Napi::Value ToxCore::toxHash(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsArrayBuffer()) {
+    if (!info[0].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info0TypedArray = info[0].As<Napi::TypedArray>();
+    if (info0TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
     
     uint8_t* hash = new uint8_t[TOX_HASH_LENGTH] { 0 };
-    
-    bool returned = tox_hash(hash, (const uint8_t*)info[0].As<Napi::ArrayBuffer>().Data(), (size_t)info[0].As<Napi::ArrayBuffer>().ByteLength());
+    Napi::Uint8Array data = info0TypedArray.As<Napi::Uint8Array>();
+    size_t length = (size_t)data.ByteLength();
+
+    bool returned = tox_hash(hash, (const uint8_t*)data.Data(), length);
     
     Napi::Object result = Napi::Object::New(env);
 
@@ -1719,17 +1804,17 @@ Napi::Value ToxCore::toxFileControl(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFileRecvControl(const Napi::CallbackInfo& info)
 {
-    if(fileRecvControlAsyncWorker != 0) {
-        delete fileRecvControlAsyncWorker;
-    }
-    fileRecvControlAsyncWorker = new FileRecvControlAsyncWorker(info[0].As<Napi::Function>());
+    fileRecvControlCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_fileRecvControlChanged(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->fileRecvControlAsyncWorker->setModel(friend_number, file_number, control);
-    toxCore->fileRecvControlAsyncWorker->Queue();
+    toxCore->fileRecvControlCallback.MakeCallback(toxCore->fileRecvControlCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->fileRecvControlCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->fileRecvControlCallback.Env(), file_number), 
+        Napi::Number::New(toxCore->fileRecvControlCallback.Env(), control)
+    });
 }
 
 Napi::Value ToxCore::toxFileSeek(const Napi::CallbackInfo& info)
@@ -1741,15 +1826,23 @@ Napi::Value ToxCore::toxFileSeek(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsArrayBuffer()) {
+    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info2TypedArray = info[2].As<Napi::TypedArray>();
+    if (info2TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
 
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
     uint32_t file_number = info[1].As<Napi::Number>().Uint32Value();
     uint64_t position = 0;
-    convertFromUint32_t2Uint64_t((uint32_t*)info[2].As<Napi::ArrayBuffer>().Data(), &position);
+    Napi::Uint8Array data = info2TypedArray.As<Napi::Uint8Array>();
+
+    convertFromUint32_t2Uint64_t((uint32_t*)data.Data(), &position);
 
     TOX_ERR_FILE_SEEK error;
     bool returned = tox_file_seek(tox, friend_number, file_number, position, &error);
@@ -1805,19 +1898,27 @@ Napi::Value ToxCore::toxFileSend(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsArrayBuffer() || !info[3].IsArrayBuffer() || !info[4].IsString()) {
+    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsTypedArray() || !info[3].IsTypedArray() || !info[4].IsString()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info2TypedArray = info[2].As<Napi::TypedArray>();
+    Napi::TypedArray info3TypedArray = info[3].As<Napi::TypedArray>();
+    if (info2TypedArray.TypedArrayType() != napi_uint8_array || info3TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
 
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
     uint32_t kind = info[1].As<Napi::Number>().Uint32Value();
     uint64_t file_size = 0;
-    convertFromUint32_t2Uint64_t((uint32_t*)info[2].As<Napi::ArrayBuffer>().Data(), &file_size);
+    convertFromUint32_t2Uint64_t((uint32_t*)info2TypedArray.As<Napi::Uint8Array>().Data(), &file_size);
     size_t filename_length = info[4].As<Napi::String>().Utf8Value().length();
+    Napi::Uint8Array file_id = info3TypedArray.As<Napi::Uint8Array>();
 
     TOX_ERR_FILE_SEND error;
-    uint32_t returned = tox_file_send(tox, friend_number, kind, file_size, (const uint8_t*)info[3].As<Napi::ArrayBuffer>().Data(), (const uint8_t *)info[4].As<Napi::String>().Utf8Value().c_str(), filename_length, &error);
+    uint32_t returned = tox_file_send(tox, friend_number, kind, file_size, (const uint8_t*)file_id.Data(), (const uint8_t *)info[4].As<Napi::String>().Utf8Value().c_str(), filename_length, &error);
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -1836,19 +1937,27 @@ Napi::Value ToxCore::toxFileSendChunk(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsArrayBuffer() || !info[3].IsArrayBuffer()) {
+    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsTypedArray() || !info[3].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info2TypedArray = info[2].As<Napi::TypedArray>();
+    Napi::TypedArray info3TypedArray = info[3].As<Napi::TypedArray>();
+    if (info2TypedArray.TypedArrayType() != napi_uint8_array || info3TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
 
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
     uint32_t file_number = info[1].As<Napi::Number>().Uint32Value();
     uint64_t position = 0;
-    convertFromUint32_t2Uint64_t((uint32_t*)info[2].As<Napi::ArrayBuffer>().Data(), &position);
-    size_t length = (size_t)info[3].As<Napi::ArrayBuffer>().ByteLength();
+    convertFromUint32_t2Uint64_t((uint32_t*)info[2].As<Napi::Uint8Array>().Data(), &position);
+    Napi::Uint8Array data = info3TypedArray.As<Napi::Uint8Array>();
+    size_t length = (size_t)data.ByteLength();
 
     TOX_ERR_FILE_SEND_CHUNK error;
-    bool returned = tox_file_send_chunk(tox, friend_number, file_number, position, (const uint8_t*)info[3].As<Napi::ArrayBuffer>().Data(), length, &error);
+    bool returned = tox_file_send_chunk(tox, friend_number, file_number, position, (const uint8_t*)data.Data(), length, &error);
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -1860,17 +1969,20 @@ Napi::Value ToxCore::toxFileSendChunk(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFileChunkRequest(const Napi::CallbackInfo& info)
 {
-    if(fileChunkRequestAsyncWorker != 0) {
-        delete fileChunkRequestAsyncWorker;
-    }
-    fileChunkRequestAsyncWorker = new FileChunkRequestAsyncWorker(info[0].As<Napi::Function>());
+    fileChunkRequestCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_fileChunkRequestChanged(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->fileChunkRequestAsyncWorker->setModel(friend_number, file_number, position, length);
-    toxCore->fileChunkRequestAsyncWorker->Queue();
+    uint32_t* position32 = new uint32_t[2] { 0 };
+    ToxCore::convertFromUint64_t2Uint32_t(&position, position32);
+    toxCore->fileChunkRequestCallback.MakeCallback(toxCore->fileChunkRequestCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->fileChunkRequestCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->fileChunkRequestCallback.Env(), file_number), 
+        Napi::ArrayBuffer::New(toxCore->fileChunkRequestCallback.Env(), position32, 8), 
+        Napi::Number::New(toxCore->fileChunkRequestCallback.Env(), length) 
+    });
 }
 
 /*
@@ -1879,32 +1991,39 @@ void ToxCore::_fileChunkRequestChanged(Tox *tox, uint32_t friend_number, uint32_
 
 void ToxCore::toxCallbackFileRecv(const Napi::CallbackInfo& info)
 {
-    if(fileRecvAsyncWorker != 0) {
-        delete fileRecvAsyncWorker;
-    }
-    fileRecvAsyncWorker = new FileRecvAsyncWorker(info[0].As<Napi::Function>());
+    fileRecvCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_fileRecvChanged(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->fileRecvAsyncWorker->setModel(friend_number, file_number, kind, file_size, filename, filename_length);
-    toxCore->fileRecvAsyncWorker->Queue();
+    uint32_t* file_size32 = new uint32_t[2] { 0 };
+    ToxCore::convertFromUint64_t2Uint32_t(&file_size, file_size32);
+    toxCore->fileRecvCallback.MakeCallback(toxCore->fileRecvCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->fileRecvCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->fileRecvCallback.Env(), file_number),
+        Napi::Number::New(toxCore->fileRecvCallback.Env(), kind), 
+        Napi::ArrayBuffer::New(toxCore->fileRecvCallback.Env(), file_size32, 8),
+        Napi::String::New(toxCore->fileRecvCallback.Env(), (const char*)filename, filename_length) 
+    });
 }
 
 void ToxCore::toxCallbackFileRecvChunk(const Napi::CallbackInfo& info)
 {
-    if(fileRecvChunkAsyncWorker != 0) {
-        delete fileRecvChunkAsyncWorker;
-    }
-    fileRecvChunkAsyncWorker = new FileRecvChunkAsyncWorker(info[0].As<Napi::Function>());
+    fileRecvChunkCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_fileRecvChunkChanged(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->fileRecvChunkAsyncWorker->setModel(friend_number, file_number, position, data, length);
-    toxCore->fileRecvChunkAsyncWorker->Queue();
+    uint32_t* position32 = new uint32_t[2] { 0 };
+    ToxCore::convertFromUint64_t2Uint32_t(&position, position32);
+    toxCore->fileRecvChunkCallback.MakeCallback(toxCore->fileRecvChunkCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->fileRecvChunkCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->fileRecvChunkCallback.Env(), file_number),
+        Napi::ArrayBuffer::New(toxCore->fileRecvChunkCallback.Env(), position32, 8),
+        Napi::ArrayBuffer::New(toxCore->fileRecvChunkCallback.Env(), (void*)data, length)
+    });
 }
 
 /*
@@ -1913,62 +2032,48 @@ void ToxCore::_fileRecvChunkChanged(Tox *tox, uint32_t friend_number, uint32_t f
 
 void ToxCore::toxCallbackConferenceInvite(const Napi::CallbackInfo& info)
 {
-    if(conferenceInviteAsyncWorker != 0) {
-        delete conferenceInviteAsyncWorker;
-    }
-    conferenceInviteAsyncWorker = new ConferenceInviteAsyncWorker(info[0].As<Napi::Function>());
+    conferenceInviteCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_conferenceInviteChanged(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->conferenceInviteAsyncWorker->setModel(friend_number, type, cookie, length);
-    toxCore->conferenceInviteAsyncWorker->Queue();
+    toxCore->conferenceInviteCallback.MakeCallback(toxCore->conferenceInviteCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->conferenceInviteCallback.Env(), friend_number), 
+        Napi::Number::New(toxCore->conferenceInviteCallback.Env(), type),
+        Napi::ArrayBuffer::New(toxCore->conferenceInviteCallback.Env(), (void*)cookie, length)
+    });
 }
 
 void ToxCore::toxCallbackConferenceMessage(const Napi::CallbackInfo& info)
 {
-    if(conferenceMessageAsyncWorker != 0) {
-        delete conferenceMessageAsyncWorker;
-    }
-    conferenceMessageAsyncWorker = new ConferenceMessageAsyncWorker(info[0].As<Napi::Function>());
+    conferenceMessageCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_conferenceMessageChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->conferenceMessageAsyncWorker->setModel(conference_number, peer_number, type, message, length);
-    toxCore->conferenceMessageAsyncWorker->Queue();
+    toxCore->conferenceMessageCallback.MakeCallback(toxCore->conferenceMessageCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->conferenceMessageCallback.Env(), conference_number),
+        Napi::Number::New(toxCore->conferenceMessageCallback.Env(), peer_number), 
+        Napi::Number::New(toxCore->conferenceMessageCallback.Env(), type),
+        Napi::String::New(toxCore->conferenceMessageCallback.Env(), (const char*)message, length)
+    });
 }
 
 void ToxCore::toxCallbackConferenceTitle(const Napi::CallbackInfo& info)
 {
-    if(conferenceTitleAsyncWorker != 0) {
-        delete conferenceTitleAsyncWorker;
-    }
-    conferenceTitleAsyncWorker = new ConferenceTitleAsyncWorker(info[0].As<Napi::Function>());
+    conferenceTitleCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_conferenceTitleChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->conferenceTitleAsyncWorker->setModel(conference_number, peer_number, title, length);
-    toxCore->conferenceTitleAsyncWorker->Queue();
-}
-
-void ToxCore::toxCallbackConferenceNamelistChange(const Napi::CallbackInfo& info)
-{
-    if(conferenceNamelistChangeAsyncWorker != 0) {
-        delete conferenceNamelistChangeAsyncWorker;
-    }
-    conferenceNamelistChangeAsyncWorker = new ConferenceNamelistChangeAsyncWorker(info[0].As<Napi::Function>());
-}
-
-void ToxCore::_conferenceNamelistChangeChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_CONFERENCE_STATE_CHANGE change, void *user_data)
-{
-    ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->conferenceNamelistChangeAsyncWorker->setModel(conference_number, peer_number, change);
-    toxCore->conferenceNamelistChangeAsyncWorker->Queue();
+    toxCore->conferenceTitleCallback.MakeCallback(toxCore->conferenceTitleCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->conferenceTitleCallback.Env(), conference_number),
+        Napi::Number::New(toxCore->conferenceTitleCallback.Env(), peer_number), 
+        Napi::String::New(toxCore->conferenceTitleCallback.Env(), (const char*)title, length)
+    });
 }
 
 Napi::Value ToxCore::toxConferenceNew(const Napi::CallbackInfo& info)
@@ -2072,19 +2177,20 @@ Napi::Value ToxCore::toxConferencePeerGetName(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 2) {
+    if (info.Length() != 3) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsNumber()) {
+    if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsNumber()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
     uint32_t conference_number = info[0].As<Napi::Number>().Uint32Value();
     uint32_t peer_number = info[1].As<Napi::Number>().Uint32Value();
-    uint8_t* name = new uint8_t[TOX_MAX_NAME_LENGTH] { 0 };
+    uint32_t name_size = info[2].As<Napi::Number>().Uint32Value();
+    uint8_t* name = new uint8_t[name_size] { 0 };
 
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     bool returned = tox_conference_peer_get_name(tox, conference_number, peer_number, name, &error);
@@ -2093,7 +2199,7 @@ Napi::Value ToxCore::toxConferencePeerGetName(const Napi::CallbackInfo& info)
 
     result.Set(Napi::String::New(env, "error"), Napi::Number::New(env, error));
     result.Set(Napi::String::New(env, "return"), Napi::Boolean::New(env, returned));
-    result.Set(Napi::String::New(env, "result"), Napi::String::New(env, (const char*)name, TOX_MAX_NAME_LENGTH));
+    result.Set(Napi::String::New(env, "result"), Napi::String::New(env, (const char*)name, name_size));
 
     return result;
 }
@@ -2193,16 +2299,23 @@ Napi::Value ToxCore::toxConferenceJoin(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsArrayBuffer()) {
+    if (!info[0].IsNumber() || !info[1].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
+    Napi::TypedArray info1TypedArray = info[1].As<Napi::TypedArray>();
+    if (info1TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
-    size_t length = (size_t)info[1].As<Napi::ArrayBuffer>().ByteLength();
+    Napi::Uint8Array cookie = info1TypedArray.As<Napi::Uint8Array>();
+    size_t length = (size_t)cookie.ByteLength();
 
     TOX_ERR_CONFERENCE_JOIN error;
-    uint32_t returned = tox_conference_join(tox, friend_number, (uint8_t*)info[1].As<Napi::ArrayBuffer>().Data(), length, &error);
+    uint32_t returned = tox_conference_join(tox, friend_number, cookie.Data(), length, &error);
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -2283,8 +2396,8 @@ Napi::Value ToxCore::toxConferenceGetTitle(const Napi::CallbackInfo& info)
     }
     
     uint32_t conference_number = info[0].As<Napi::Number>().Uint32Value();
-    size_t size = info[1].As<Napi::Number>().Uint32Value();
-    uint8_t* title = new uint8_t[size] { 0 };
+    size_t title_size = info[1].As<Napi::Number>().Uint32Value();
+    uint8_t* title = new uint8_t[title_size] { 0 };
 
     TOX_ERR_CONFERENCE_TITLE error;
     bool returned = tox_conference_get_title(tox, conference_number, title, &error);
@@ -2293,7 +2406,7 @@ Napi::Value ToxCore::toxConferenceGetTitle(const Napi::CallbackInfo& info)
 
     result.Set(Napi::String::New(env, "error"), Napi::Number::New(env, error));
     result.Set(Napi::String::New(env, "return"), Napi::Boolean::New(env, returned));
-    result.Set(Napi::String::New(env, "result"), Napi::ArrayBuffer::New(env, title, size));
+    result.Set(Napi::String::New(env, "result"), Napi::String::New(env, (const char*)title, title_size));
 
     return result;
 }
@@ -2349,7 +2462,7 @@ Napi::Value ToxCore::toxConferenceGetChatlist(const Napi::CallbackInfo& info)
     uint32_t* chatlist = new uint32_t[size] { 0 };
     
     tox_conference_get_chatlist(tox, chatlist);
-    return Napi::ArrayBuffer::New(env, chatlist, size);
+    return Napi::ArrayBuffer::New(env, chatlist, size * 4);
 }
 
 Napi::Value ToxCore::toxConferenceGetType(const Napi::CallbackInfo& info)
@@ -2392,16 +2505,23 @@ Napi::Value ToxCore::toxFriendSendLossyPacket(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsArrayBuffer()) {
+    if (!info[0].IsNumber() || !info[1].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info1TypedArray = info[1].As<Napi::TypedArray>();
+    if (info1TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
     
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
-    size_t length = info[1].As<Napi::ArrayBuffer>().ByteLength();
+    Napi::Uint8Array data = info1TypedArray.As<Napi::Uint8Array>();
+    size_t length = data.ByteLength();
 
     TOX_ERR_FRIEND_CUSTOM_PACKET error;
-    bool returned = tox_friend_send_lossy_packet(tox, friend_number, (const uint8_t*)info[1].As<Napi::ArrayBuffer>().Data(), length, &error);
+    bool returned = tox_friend_send_lossy_packet(tox, friend_number, (const uint8_t*)data.Data(), length, &error);
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -2420,16 +2540,23 @@ Napi::Value ToxCore::toxFriendSendLosslessPacket(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    if (!info[0].IsNumber() || !info[1].IsArrayBuffer()) {
+    if (!info[0].IsNumber() || !info[1].IsTypedArray()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::TypedArray info1TypedArray = info[1].As<Napi::TypedArray>();
+    if (info1TypedArray.TypedArrayType() != napi_uint8_array) {
+        Napi::TypeError::New(env, "Wrong array type").ThrowAsJavaScriptException();
         return env.Null();
     }
     
     uint32_t friend_number = info[0].As<Napi::Number>().Uint32Value();
-    size_t length = info[1].As<Napi::ArrayBuffer>().ByteLength();
+    Napi::Uint8Array data = info1TypedArray.As<Napi::Uint8Array>();
+    size_t length = data.ByteLength();
 
     TOX_ERR_FRIEND_CUSTOM_PACKET error;
-    bool returned = tox_friend_send_lossless_packet(tox, friend_number, (const uint8_t*)info[1].As<Napi::ArrayBuffer>().Data(), length, &error);
+    bool returned = tox_friend_send_lossless_packet(tox, friend_number, (const uint8_t*)data.Data(), length, &error);
 
     Napi::Object result = Napi::Object::New(env);
 
@@ -2441,32 +2568,30 @@ Napi::Value ToxCore::toxFriendSendLosslessPacket(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendLossyPacket(const Napi::CallbackInfo& info)
 {
-    if(friendLossyPacketAsyncWorker != 0) {
-        delete friendLossyPacketAsyncWorker;
-    }
-    friendLossyPacketAsyncWorker = new FriendLossyPacketAsyncWorker(info[0].As<Napi::Function>());
+    friendLossyPacketCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendLossyPacketChanged(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendLossyPacketAsyncWorker->setModel(friend_number, data, length);
-    toxCore->friendLossyPacketAsyncWorker->Queue();
+    toxCore->friendLossyPacketCallback.MakeCallback(toxCore->friendLossyPacketCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendLossyPacketCallback.Env(), friend_number),
+        Napi::ArrayBuffer::New(toxCore->friendLossyPacketCallback.Env(), (void*)data, length)
+    });
 }
 
 void ToxCore::toxCallbackFriendLosslessPacket(const Napi::CallbackInfo& info)
 {
-    if(friendLosslessPacketAsyncWorker != 0) {
-        delete friendLosslessPacketAsyncWorker;
-    }
-    friendLosslessPacketAsyncWorker = new FriendLosslessPacketAsyncWorker(info[0].As<Napi::Function>());
+    friendLosslessPacketCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendLosslessPacketChanged(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    toxCore->friendLosslessPacketAsyncWorker->setModel(friend_number, data, length);
-    toxCore->friendLosslessPacketAsyncWorker->Queue();
+    toxCore->friendLosslessPacketCallback.MakeCallback(toxCore->friendLosslessPacketCallback.Env().Global(), { 
+        Napi::Number::New(toxCore->friendLosslessPacketCallback.Env(), friend_number),
+        Napi::ArrayBuffer::New(toxCore->friendLosslessPacketCallback.Env(), (void*)data, length)
+    });
 }
 
 Napi::Value ToxCore::toxSelfGetDhtId(const Napi::CallbackInfo& info)
@@ -2504,447 +2629,4 @@ Napi::Value ToxCore::toxSelfGetTcpPort(const Napi::CallbackInfo& info)
     result.Set(Napi::String::New(env, "return"), Napi::Number::New(env, returned));
 
     return result;
-}
-
-/*
- * Additional callback services
- */
-
-SelfConnectionStatusAsyncWorker::SelfConnectionStatusAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void SelfConnectionStatusAsyncWorker::Execute() {}
-
-void SelfConnectionStatusAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), {
-        Napi::Number::New(env, connection_status)
-    });
-}
-
-void SelfConnectionStatusAsyncWorker::OnError(const Napi::Error& e) {}
-
-void SelfConnectionStatusAsyncWorker::setModel(TOX_CONNECTION connection_status)
-{
-    this->connection_status = connection_status;
-}
-
-FriendNameAsyncWorker::FriendNameAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendNameAsyncWorker::Execute() {}
-
-void FriendNameAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::String::New(env, (const char*)name, length)
-    });
-}
-
-void FriendNameAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendNameAsyncWorker::setModel(uint32_t friend_number, const uint8_t *name, size_t length)
-{
-    this->friend_number = friend_number;
-    this->name = name;
-    this->length = length;
-}
-
-FriendStatusMessageAsyncWorker::FriendStatusMessageAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendStatusMessageAsyncWorker::Execute() {}
-
-void FriendStatusMessageAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::String::New(env, (const char*)message, length)
-    });
-}
-
-void FriendStatusMessageAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendStatusMessageAsyncWorker::setModel(uint32_t friend_number, const uint8_t *name, size_t length)
-{
-    this->friend_number = friend_number;
-    this->message = message;
-    this->length = length;
-}
-
-FriendStatusAsyncWorker::FriendStatusAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendStatusAsyncWorker::Execute() {}
-
-void FriendStatusAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, status) 
-    });
-}
-
-void FriendStatusAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendStatusAsyncWorker::setModel(uint32_t friend_number, TOX_USER_STATUS status)
-{
-    this->friend_number = friend_number;
-    this->status = status;
-}
-
-FriendConnectionStatusAsyncWorker::FriendConnectionStatusAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendConnectionStatusAsyncWorker::Execute() {}
-
-void FriendConnectionStatusAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, connection_status) 
-    });
-}
-
-void FriendConnectionStatusAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendConnectionStatusAsyncWorker::setModel(uint32_t friend_number, TOX_CONNECTION connection_status)
-{
-    this->friend_number = friend_number;
-    this->connection_status = connection_status;
-}
-
-FriendTypingAsyncWorker::FriendTypingAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendTypingAsyncWorker::Execute() {}
-
-void FriendTypingAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Boolean::New(env, is_typing) 
-    });
-}
-
-void FriendTypingAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendTypingAsyncWorker::setModel(uint32_t friend_number, bool is_typing)
-{
-    this->friend_number = friend_number;
-    this->is_typing = is_typing;
-}
-
-FriendReadReceiptAsyncWorker::FriendReadReceiptAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendReadReceiptAsyncWorker::Execute() {}
-
-void FriendReadReceiptAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { Napi::Number::New(env, friend_number), Napi::Number::New(env, message_id) });
-}
-
-void FriendReadReceiptAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendReadReceiptAsyncWorker::setModel(uint32_t friend_number, uint32_t message_id)
-{
-    this->friend_number = friend_number;
-    this->message_id = message_id;
-}
-
-FriendRequestAsyncWorker::FriendRequestAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendRequestAsyncWorker::Execute() {}
-
-void FriendRequestAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::ArrayBuffer::New(env, (void*)public_key, TOX_PUBLIC_KEY_SIZE),
-        Napi::String::New(env, (const char*)message, length) 
-    });
-}
-
-void FriendRequestAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendRequestAsyncWorker::setModel(const uint8_t *public_key, const uint8_t *message, size_t length)
-{
-    this->public_key = public_key;
-    this->message = message;
-    this->length = length;
-}
-
-FriendMessageAsyncWorker::FriendMessageAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendMessageAsyncWorker::Execute() {}
-
-void FriendMessageAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, type), 
-        Napi::String::New(env, (const char*)message, length) 
-    });
-}
-
-void FriendMessageAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendMessageAsyncWorker::setModel(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length)
-{
-    this->friend_number = friend_number;
-    this->type = type;
-    this->message = message;
-    this->length = length;
-}
-
-FileRecvControlAsyncWorker::FileRecvControlAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FileRecvControlAsyncWorker::Execute() {}
-
-void FileRecvControlAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, file_number), 
-        Napi::Number::New(env, control) 
-    });
-}
-
-void FileRecvControlAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FileRecvControlAsyncWorker::setModel(uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control)
-{
-    this->friend_number = friend_number;
-    this->file_number = file_number;
-    this->control = control;
-}
-
-FileChunkRequestAsyncWorker::FileChunkRequestAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FileChunkRequestAsyncWorker::Execute() {}
-
-void FileChunkRequestAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    uint32_t* position32 = new uint32_t[2] { 0 };
-    ToxCore::convertFromUint64_t2Uint32_t(&position64, position32);
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, file_number), 
-        Napi::ArrayBuffer::New(env, position32, 8), 
-        Napi::Number::New(env, length) 
-    });
-}
-
-void FileChunkRequestAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FileChunkRequestAsyncWorker::setModel(uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length)
-{
-    this->friend_number = friend_number;
-    this->file_number = file_number;
-    this->position64 = position;
-    this->length = length;
-}
-
-FileRecvAsyncWorker::FileRecvAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FileRecvAsyncWorker::Execute() {}
-
-void FileRecvAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    uint32_t* file_size32 = new uint32_t[2] { 0 };
-    ToxCore::convertFromUint64_t2Uint32_t(&file_size64, file_size32);
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, file_number),
-        Napi::Number::New(env, kind), 
-        Napi::ArrayBuffer::New(env, file_size32, 8),
-        Napi::String::New(env, (const char*)filename, filename_length) 
-    });
-}
-
-void FileRecvAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FileRecvAsyncWorker::setModel(uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length)
-{
-    this->friend_number = friend_number;
-    this->file_number = file_number;
-    this->kind = kind;
-    this->file_size64 = file_size;
-    this->filename = filename;
-    this->filename_length = filename_length;
-}
-
-FileRecvChunkAsyncWorker::FileRecvChunkAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FileRecvChunkAsyncWorker::Execute() {}
-
-void FileRecvChunkAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    uint32_t* position32 = new uint32_t[2] { 0 };
-    ToxCore::convertFromUint64_t2Uint32_t(&position64, position32);
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, file_number),
-        Napi::ArrayBuffer::New(env, position32, 8),
-        Napi::ArrayBuffer::New(env, (void*)data, length)
-    });
-}
-
-void FileRecvChunkAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FileRecvChunkAsyncWorker::setModel(uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length)
-{
-    this->friend_number = friend_number;
-    this->file_number = file_number;
-    this->position64 = position;
-    this->data = data;
-    this->length = length;
-}
-
-ConferenceInviteAsyncWorker::ConferenceInviteAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void ConferenceInviteAsyncWorker::Execute() {}
-
-void ConferenceInviteAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number), 
-        Napi::Number::New(env, type),
-        Napi::ArrayBuffer::New(env, (void*)cookie, length)
-    });
-}
-
-void ConferenceInviteAsyncWorker::OnError(const Napi::Error& e) {}
-
-void ConferenceInviteAsyncWorker::setModel(uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length)
-{
-    this->friend_number = friend_number;
-    this->type = type;
-    this->cookie = cookie;
-    this->length = length;
-}
-
-ConferenceMessageAsyncWorker::ConferenceMessageAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void ConferenceMessageAsyncWorker::Execute() {}
-
-void ConferenceMessageAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, conference_number),
-        Napi::Number::New(env, peer_number), 
-        Napi::Number::New(env, type),
-        Napi::String::New(env, (const char*)message, length)
-    });
-}
-
-void ConferenceMessageAsyncWorker::OnError(const Napi::Error& e) {}
-
-void ConferenceMessageAsyncWorker::setModel(uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length)
-{
-    this->conference_number = conference_number;
-    this->peer_number = peer_number;
-    this->type = type;
-    this->message = message;
-    this->length = length;
-}
-
-ConferenceTitleAsyncWorker::ConferenceTitleAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void ConferenceTitleAsyncWorker::Execute() {}
-
-void ConferenceTitleAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, conference_number),
-        Napi::Number::New(env, peer_number), 
-        Napi::String::New(env, (const char*)title, length)
-    });
-}
-
-void ConferenceTitleAsyncWorker::OnError(const Napi::Error& e) {}
-
-void ConferenceTitleAsyncWorker::setModel(uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length)
-{
-    this->conference_number = conference_number;
-    this->peer_number = peer_number;
-    this->title = title;
-    this->length = length;
-}
-
-ConferenceNamelistChangeAsyncWorker::ConferenceNamelistChangeAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void ConferenceNamelistChangeAsyncWorker::Execute() {}
-
-void ConferenceNamelistChangeAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, conference_number),
-        Napi::Number::New(env, peer_number), 
-        Napi::Number::New(env, change)
-    });
-}
-
-void ConferenceNamelistChangeAsyncWorker::OnError(const Napi::Error& e) {}
-
-void ConferenceNamelistChangeAsyncWorker::setModel(uint32_t conference_number, uint32_t peer_number, TOX_CONFERENCE_STATE_CHANGE change)
-{
-    this->conference_number = conference_number;
-    this->peer_number = peer_number;
-    this->change = change;
-}
-
-FriendLossyPacketAsyncWorker::FriendLossyPacketAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendLossyPacketAsyncWorker::Execute() {}
-
-void FriendLossyPacketAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number),
-        Napi::ArrayBuffer::New(env, (void*)data, length)
-    });
-}
-
-void FriendLossyPacketAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendLossyPacketAsyncWorker::setModel(uint32_t friend_number, const uint8_t *data, size_t length)
-{
-    this->friend_number = friend_number;
-    this->data = data;
-    this->length = length;
-}
-
-FriendLosslessPacketAsyncWorker::FriendLosslessPacketAsyncWorker(const Napi::Function& callback) : Napi::AsyncWorker(callback) {}
-
-void FriendLosslessPacketAsyncWorker::Execute() {}
-
-void FriendLosslessPacketAsyncWorker::OnOK()
-{
-    Napi::Env env = Env();
-    Callback().MakeCallback(Receiver().Value(), { 
-        Napi::Number::New(env, friend_number),
-        Napi::ArrayBuffer::New(env, (void*)data, length)
-    });
-}
-
-void FriendLosslessPacketAsyncWorker::OnError(const Napi::Error& e) {}
-
-void FriendLosslessPacketAsyncWorker::setModel(uint32_t friend_number, const uint8_t *data, size_t length)
-{
-    this->friend_number = friend_number;
-    this->data = data;
-    this->length = length;
 }
