@@ -19,25 +19,6 @@ extern "C" {
 #endif
 
 class ToxCore;
-class SelfConnectionStatusAsyncWorker;
-class FriendNameAsyncWorker;
-class FriendStatusMessageAsyncWorker;
-class FriendStatusAsyncWorker;
-class FriendConnectionStatusAsyncWorker;
-class FriendTypingAsyncWorker;
-class FriendReadReceiptAsyncWorker;
-class FriendRequestAsyncWorker;
-class FriendMessageAsyncWorker;
-class FileRecvControlAsyncWorker;
-class FileChunkRequestAsyncWorker;
-class FileRecvAsyncWorker;
-class FileRecvChunkAsyncWorker;
-class ConferenceInviteAsyncWorker;
-class ConferenceMessageAsyncWorker;
-class ConferenceTitleAsyncWorker;
-class ConferenceNamelistChangeAsyncWorker;
-class FriendLossyPacketAsyncWorker;
-class FriendLosslessPacketAsyncWorker;
 
 class ToxCore : public Napi::ObjectWrap<ToxCore>
 {
@@ -50,10 +31,29 @@ public:
     static void convertFromUint32_t2Uint64_t(const uint32_t* source, uint64_t* result);
 private:
     static Napi::FunctionReference constructor;
+
     /*  
-     * Additional functions and components
+     * Additional functions
      */
-    void bindCallbacks(const Napi::CallbackInfo& info);
+    void updateToxCallbackSelfConnectionStatus(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendName(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendStatusMessage(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendStatus(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendConnectionStatus(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendTyping(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendReadReceipt(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendRequest(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendMessage(const Napi::CallbackInfo& info);
+    void updateToxCallbackFileRecvControl(const Napi::CallbackInfo& info);
+    void updateToxCallbackFileChunkRequest(const Napi::CallbackInfo& info);
+    void updateToxCallbackFileRecv(const Napi::CallbackInfo& info);
+    void updateToxCallbackFileRecvChunk(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferenceInvite(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferenceMessage(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferenceTitle(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferenceNamelistChange(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendLossyPacket(const Napi::CallbackInfo& info);
+    void updateToxCallbackFriendLosslessPacket(const Napi::CallbackInfo& info);
     /* 
      * API version
      */
@@ -226,8 +226,7 @@ private:
     static void _conferenceMessageChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
     void toxCallbackConferenceTitle(const Napi::CallbackInfo& info);
     static void _conferenceTitleChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length, void *user_data);
-    void toxCallbackConferenceNamelistChange(const Napi::CallbackInfo& info);
-    static void _conferenceNamelistChangeChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_CONFERENCE_STATE_CHANGE change, void *user_data);
+
     Napi::Value toxConferenceNew(const Napi::CallbackInfo& info);
     Napi::Value toxConferenceDelete(const Napi::CallbackInfo& info);
     Napi::Value toxConferencePeerCount(const Napi::CallbackInfo& info);
@@ -264,315 +263,24 @@ private:
     Tox_Options* toxOptions;
     Tox* tox;
 
-    SelfConnectionStatusAsyncWorker* selfConnectionStatusAsyncWorker;
-    FriendNameAsyncWorker* friendNameAsyncWorker;
-    FriendStatusMessageAsyncWorker* friendStatusMessageAsyncWorker;
-    FriendStatusAsyncWorker* friendStatusAsyncWorker;
-    FriendConnectionStatusAsyncWorker* friendConnectionStatusAsyncWorker;
-    FriendTypingAsyncWorker* friendTypingAsyncWorker;
-    FriendReadReceiptAsyncWorker* friendReadReceiptAsyncWorker;
-    FriendRequestAsyncWorker* friendRequestAsyncWorker;
-    FriendMessageAsyncWorker* friendMessageAsyncWorker;
-    FileRecvControlAsyncWorker* fileRecvControlAsyncWorker;
-    FileChunkRequestAsyncWorker* fileChunkRequestAsyncWorker;
-    FileRecvAsyncWorker* fileRecvAsyncWorker;
-    FileRecvChunkAsyncWorker* fileRecvChunkAsyncWorker;
-    ConferenceInviteAsyncWorker* conferenceInviteAsyncWorker;
-    ConferenceMessageAsyncWorker* conferenceMessageAsyncWorker;
-    ConferenceTitleAsyncWorker* conferenceTitleAsyncWorker;
-    ConferenceNamelistChangeAsyncWorker* conferenceNamelistChangeAsyncWorker;
-    FriendLossyPacketAsyncWorker* friendLossyPacketAsyncWorker;
-    FriendLosslessPacketAsyncWorker* friendLosslessPacketAsyncWorker;
-};
-
-class SelfConnectionStatusAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    SelfConnectionStatusAsyncWorker(const Napi::Function& callback);
-    void setModel(TOX_CONNECTION connection_status);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    TOX_CONNECTION connection_status;
-};
-
-class FriendNameAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendNameAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, const uint8_t *name, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    const uint8_t *name; 
-    size_t length;
-};
-
-class FriendStatusMessageAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendStatusMessageAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, const uint8_t *message, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    const uint8_t *message; 
-    size_t length;
-};
-
-class FriendStatusAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendStatusAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, TOX_USER_STATUS status);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    TOX_USER_STATUS status;
-};
-
-class FriendConnectionStatusAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendConnectionStatusAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, TOX_CONNECTION connection_status);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    TOX_CONNECTION connection_status;
-};
-
-class FriendTypingAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendTypingAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, bool is_typing);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    bool is_typing;
-};
-
-class FriendReadReceiptAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendReadReceiptAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, uint32_t message_id);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    uint32_t message_id;
-};
-
-class FriendRequestAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendRequestAsyncWorker(const Napi::Function& callback);
-    void setModel(const uint8_t *public_key, const uint8_t *message, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    const uint8_t *public_key;
-    const uint8_t *message;
-    size_t length;
-};
-
-class FriendMessageAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendMessageAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    TOX_MESSAGE_TYPE type;
-    const uint8_t *message;
-    size_t length;
-};
-
-class FileRecvControlAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FileRecvControlAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    uint32_t file_number;
-    TOX_FILE_CONTROL control;
-};
-
-class FileChunkRequestAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FileChunkRequestAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    uint32_t file_number;
-    uint64_t position64;
-    size_t length;
-};
-
-class FileRecvAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FileRecvAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    uint32_t file_number;
-    uint32_t kind;
-    uint64_t file_size64;
-    const uint8_t *filename;
-    size_t filename_length;
-};
-
-class FileRecvChunkAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FileRecvChunkAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    uint32_t file_number;
-    uint64_t position64;
-    const uint8_t *data;
-    size_t length;
-};
-
-class ConferenceInviteAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    ConferenceInviteAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    TOX_CONFERENCE_TYPE type;
-    const uint8_t *cookie;
-    size_t length;
-};
-
-class ConferenceMessageAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    ConferenceMessageAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t conference_number;
-    uint32_t peer_number;
-    TOX_MESSAGE_TYPE type;
-    const uint8_t *message;
-    size_t length;
-};
-
-class ConferenceTitleAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    ConferenceTitleAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t conference_number;
-    uint32_t peer_number;
-    const uint8_t *title;
-    size_t length;
-};
-
-class ConferenceNamelistChangeAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    ConferenceNamelistChangeAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t conference_number, uint32_t peer_number, TOX_CONFERENCE_STATE_CHANGE change);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t conference_number;
-    uint32_t peer_number;
-    TOX_CONFERENCE_STATE_CHANGE change;
-};
-
-class FriendLossyPacketAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendLossyPacketAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, const uint8_t *data, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    const uint8_t *data;
-    size_t length;
-};
-
-class FriendLosslessPacketAsyncWorker : public Napi::AsyncWorker
-{
-public:
-    FriendLosslessPacketAsyncWorker(const Napi::Function& callback);
-    void setModel(uint32_t friend_number, const uint8_t *data, size_t length);
-protected:
-    void Execute() override;
-    void OnOK() override;
-    void OnError(const Napi::Error& e) override;
-private:
-    uint32_t friend_number;
-    const uint8_t *data;
-    size_t length;
+    Napi::FunctionReference selfConnectionStatusCallback;
+    Napi::FunctionReference friendNameCallback;
+    Napi::FunctionReference friendStatusMessageCallback;
+    Napi::FunctionReference friendStatusCallback;
+    Napi::FunctionReference friendConnectionStatusCallback;
+    Napi::FunctionReference friendTypingCallback;
+    Napi::FunctionReference friendReadReceiptCallback;
+    Napi::FunctionReference friendRequestCallback;
+    Napi::FunctionReference friendMessageCallback;
+    Napi::FunctionReference fileRecvControlCallback;
+    Napi::FunctionReference fileChunkRequestCallback;
+    Napi::FunctionReference fileRecvCallback;
+    Napi::FunctionReference fileRecvChunkCallback;
+    Napi::FunctionReference conferenceInviteCallback;
+    Napi::FunctionReference conferenceMessageCallback;
+    Napi::FunctionReference conferenceTitleCallback;
+    Napi::FunctionReference friendLossyPacketCallback;
+    Napi::FunctionReference friendLosslessPacketCallback;
 };
 
 #endif // TOXCORE_H
