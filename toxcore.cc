@@ -1,12 +1,10 @@
 
 /*
- * https://github.com/w3x731/ToxNode
+ * https://github.com/w3x731/NodeTox
  */
 
 #include "toxcore.h"
 #include <tox/tox.h>
-
-#include <iostream>
 
 Napi::FunctionReference ToxCore::constructor;
 
@@ -31,6 +29,10 @@ Napi::Object ToxCore::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("updateToxCallbackConferenceInvite", &ToxCore::updateToxCallbackConferenceInvite),
         InstanceMethod("updateToxCallbackConferenceMessage", &ToxCore::updateToxCallbackConferenceMessage),
         InstanceMethod("updateToxCallbackConferenceTitle", &ToxCore::updateToxCallbackConferenceTitle),
+
+        InstanceMethod("updateToxCallbackConferencePeerName", &ToxCore::updateToxCallbackConferencePeerName),
+        InstanceMethod("updateToxCallbackConferencePeerListChanged", &ToxCore::updateToxCallbackConferencePeerListChanged),
+
         InstanceMethod("updateToxCallbackFriendLossyPacket", &ToxCore::updateToxCallbackFriendLossyPacket),
         InstanceMethod("updateToxCallbackFriendLosslessPacket", &ToxCore::updateToxCallbackFriendLosslessPacket),        
 
@@ -159,6 +161,10 @@ Napi::Object ToxCore::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("toxCallbackConferenceInvite", &ToxCore::toxCallbackConferenceInvite),
         InstanceMethod("toxCallbackConferenceMessage", &ToxCore::toxCallbackConferenceMessage),
         InstanceMethod("toxCallbackConferenceTitle", &ToxCore::toxCallbackConferenceTitle),
+        //
+        InstanceMethod("toxCallbackConferencePeerName", &ToxCore::toxCallbackConferencePeerName),
+        InstanceMethod("toxCallbackConferencePeerListChanged", &ToxCore::toxCallbackConferencePeerListChanged),        
+        //
         InstanceMethod("toxConferenceNew", &ToxCore::toxConferenceNew),
         InstanceMethod("toxConferenceDelete", &ToxCore::toxConferenceDelete),
         InstanceMethod("toxConferencePeerCount", &ToxCore::toxConferencePeerCount),
@@ -303,6 +309,16 @@ void ToxCore::updateToxCallbackConferenceMessage(const Napi::CallbackInfo& info)
 void ToxCore::updateToxCallbackConferenceTitle(const Napi::CallbackInfo& info)
 {
     tox_callback_conference_title(tox, _conferenceTitleChanged);
+}
+
+void ToxCore::updateToxCallbackConferencePeerName(const Napi::CallbackInfo& info)
+{
+    tox_callback_conference_peer_name(tox, _conferencePeerNameChanged);
+}
+
+void ToxCore::updateToxCallbackConferencePeerListChanged(const Napi::CallbackInfo& info)
+{
+    tox_callback_conference_peer_list_changed(tox, _conferencePeerListChangedChanged);
 }
 
 void ToxCore::updateToxCallbackFriendLossyPacket(const Napi::CallbackInfo& info)
@@ -517,9 +533,6 @@ void ToxCore::toxOptionsSetProxyType(const Napi::CallbackInfo& info)
 
 Napi::Value ToxCore::toxOptionsGetProxyHost(const Napi::CallbackInfo& info)
 {
-    std::cout << toxOptions << std::endl;
-    std::cout << tox_options_get_proxy_host(toxOptions) << std::endl;
-    
     return Napi::String::New(info.Env(), tox_options_get_proxy_host(toxOptions));
 }
 
@@ -904,17 +917,11 @@ Napi::Value ToxCore::toxAddTcpRelay(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackSelfConnectionStatus(const Napi::CallbackInfo& info)
 {
-    // if(selfConnectionStatusAsyncWorker != 0) {
-    //     delete selfConnectionStatusAsyncWorker;
-    // }
-    // selfConnectionStatusAsyncWorker = new SelfConnectionStatusAsyncWorker(info[0].As<Napi::Function>());
     selfConnectionStatusCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_selfConnectionStatusChanged(Tox *tox, TOX_CONNECTION connection_status, void *user_data)
 {
-    // toxCore->selfConnectionStatusAsyncWorker->setModel(connection_status);
-    // toxCore->selfConnectionStatusAsyncWorker->Queue();
     ToxCore* toxCore = (ToxCore*)user_data;
     toxCore->selfConnectionStatusCallback.MakeCallback(toxCore->selfConnectionStatusCallback.Env().Global(), { Napi::Number::New(toxCore->selfConnectionStatusCallback.Env(), connection_status) });
 }
@@ -1416,18 +1423,13 @@ Napi::Value ToxCore::toxFriendGetName(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendName(const Napi::CallbackInfo& info)
 {
-    // if(friendNameAsyncWorker != 0) {
-    //     delete friendNameAsyncWorker;
-    // }
-    // friendNameAsyncWorker = new FriendNameAsyncWorker(info[0].As<Napi::Function>());
     friendNameCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendNameChanged(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    // toxCore->friendNameAsyncWorker->setModel(friend_number, name, length);
-    // toxCore->friendNameAsyncWorker->Queue();
+
     toxCore->friendNameCallback.MakeCallback(toxCore->friendNameCallback.Env().Global(), { 
         Napi::Number::New(toxCore->friendNameCallback.Env(), friend_number), 
         Napi::String::New(toxCore->friendNameCallback.Env(), (const char*)name, length)
@@ -1494,18 +1496,13 @@ Napi::Value ToxCore::toxFriendGetStatusMessage(const Napi::CallbackInfo& info)
 
 void ToxCore::toxCallbackFriendStatusMessage(const Napi::CallbackInfo& info)
 {
-    // if(friendStatusMessageAsyncWorker != 0) {
-    //     delete friendStatusMessageAsyncWorker;
-    // }
-    // friendStatusMessageAsyncWorker = new FriendStatusMessageAsyncWorker(info[0].As<Napi::Function>());
     friendStatusMessageCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
 }
 
 void ToxCore::_friendStatusMessageChanged(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
-    // toxCore->friendStatusMessageAsyncWorker->setModel(friend_number, message, length);
-    // toxCore->friendStatusMessageAsyncWorker->Queue();
+    
     toxCore->friendStatusMessageCallback.MakeCallback(toxCore->friendStatusMessageCallback.Env().Global(), { 
         Napi::Number::New(toxCore->friendStatusMessageCallback.Env(), friend_number), 
         Napi::String::New(toxCore->friendStatusMessageCallback.Env(), (const char*)message, length)
@@ -2069,10 +2066,41 @@ void ToxCore::toxCallbackConferenceTitle(const Napi::CallbackInfo& info)
 void ToxCore::_conferenceTitleChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length, void *user_data)
 {
     ToxCore* toxCore = (ToxCore*)user_data;
+
     toxCore->conferenceTitleCallback.MakeCallback(toxCore->conferenceTitleCallback.Env().Global(), { 
         Napi::Number::New(toxCore->conferenceTitleCallback.Env(), conference_number),
         Napi::Number::New(toxCore->conferenceTitleCallback.Env(), peer_number), 
         Napi::String::New(toxCore->conferenceTitleCallback.Env(), (const char*)title, length)
+    });
+}
+
+void ToxCore::toxCallbackConferencePeerName(const Napi::CallbackInfo& info)
+{
+    conferencePeerNameCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
+}
+
+void ToxCore::_conferencePeerNameChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *name, size_t length, void *user_data)
+{
+    ToxCore* toxCore = (ToxCore*)user_data;
+
+    toxCore->conferencePeerNameCallback.MakeCallback(toxCore->conferencePeerNameCallback.Env().Global(), {
+        Napi::Number::New(toxCore->conferencePeerNameCallback.Env(), conference_number),
+        Napi::Number::New(toxCore->conferencePeerNameCallback.Env(), peer_number), 
+        Napi::String::New(toxCore->conferencePeerNameCallback.Env(), (const char*)name, length)
+    });
+}
+
+void ToxCore::toxCallbackConferencePeerListChanged(const Napi::CallbackInfo& info)
+{
+    conferencePeerListChangedCallback = Napi::Reference<Napi::Function>::New(info[0].As<Napi::Function>());
+}
+
+void ToxCore::_conferencePeerListChangedChanged(Tox *tox, uint32_t conference_number, void *user_data)
+{
+    ToxCore* toxCore = (ToxCore*)user_data;
+
+    toxCore->conferencePeerListChangedCallback.MakeCallback(toxCore->conferencePeerListChangedCallback.Env().Global(), {
+        Napi::Number::New(toxCore->conferencePeerListChangedCallback.Env(), conference_number)
     });
 }
 

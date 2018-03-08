@@ -28,7 +28,7 @@ npm init
 npm install node-addon-api
 ```
 7. In file binding.gyp specify your own path to the include files and libs
-8. In package root type [node-gyp clean configure build --verbose --arch=ia32](https://stackoverflow.com/questions/22448885/how-do-i-build-32-bit-binaries-on-a-64-bit-system-using-npm)
+8. In package root, as administrator, type [node-gyp clean configure build --verbose --arch=ia32](https://stackoverflow.com/questions/22448885/how-do-i-build-32-bit-binaries-on-a-64-bit-system-using-npm)
 9. Put `libsodium.dll` and `pthreadVC2.dll` into root package folder. You must put these files in another projects that uses obtained ToxAddon.
 10. Ok, you would get build folder where lay files ToxAddon.node and ToxAddon.lib. After that you may type `node index.js` and you would see "connected 2" over time. That works!
 

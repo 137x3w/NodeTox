@@ -1,6 +1,6 @@
 
 /*
- * https://github.com/w3x731/ToxNode
+ * https://github.com/w3x731/NodeTox
  */
 
 #ifndef TOXCORE_H
@@ -50,8 +50,9 @@ private:
     void updateToxCallbackFileRecvChunk(const Napi::CallbackInfo& info);
     void updateToxCallbackConferenceInvite(const Napi::CallbackInfo& info);
     void updateToxCallbackConferenceMessage(const Napi::CallbackInfo& info);
-    void updateToxCallbackConferenceTitle(const Napi::CallbackInfo& info);
-    void updateToxCallbackConferenceNamelistChange(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferenceTitle(const Napi::CallbackInfo& info);    
+    void updateToxCallbackConferencePeerName(const Napi::CallbackInfo& info);
+    void updateToxCallbackConferencePeerListChanged(const Napi::CallbackInfo& info);
     void updateToxCallbackFriendLossyPacket(const Napi::CallbackInfo& info);
     void updateToxCallbackFriendLosslessPacket(const Napi::CallbackInfo& info);
     /* 
@@ -226,6 +227,10 @@ private:
     static void _conferenceMessageChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
     void toxCallbackConferenceTitle(const Napi::CallbackInfo& info);
     static void _conferenceTitleChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title, size_t length, void *user_data);
+    void toxCallbackConferencePeerName(const Napi::CallbackInfo& info);
+    static void _conferencePeerNameChanged(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *name, size_t length, void *user_data);
+    void toxCallbackConferencePeerListChanged(const Napi::CallbackInfo& info);
+    static void _conferencePeerListChangedChanged(Tox *tox, uint32_t conference_number, void *user_data);
 
     Napi::Value toxConferenceNew(const Napi::CallbackInfo& info);
     Napi::Value toxConferenceDelete(const Napi::CallbackInfo& info);
@@ -259,7 +264,6 @@ private:
     Napi::Value toxSelfGetUdpPort(const Napi::CallbackInfo& info);
     Napi::Value toxSelfGetTcpPort(const Napi::CallbackInfo& info);
 
-
     Tox_Options* toxOptions;
     Tox* tox;
 
@@ -279,6 +283,8 @@ private:
     Napi::FunctionReference conferenceInviteCallback;
     Napi::FunctionReference conferenceMessageCallback;
     Napi::FunctionReference conferenceTitleCallback;
+    Napi::FunctionReference conferencePeerNameCallback;
+    Napi::FunctionReference conferencePeerListChangedCallback;
     Napi::FunctionReference friendLossyPacketCallback;
     Napi::FunctionReference friendLosslessPacketCallback;
 };
