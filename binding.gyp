@@ -30,13 +30,13 @@
 		'include_dirs': [
         	'<!@(node -p \'require("node-addon-api").include\')',
 	        #v0.2.0
-	        'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/tox/v0.2.0/buildOnMSVC17/include',
+	        'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/tox/v0.2.3/buildOnMSVC17/include',
 	        'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/libsodium/include',
 	        'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/pthreads/include',
 	        'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/node_modules/node-addon-api',
       	],
       	'libraries': [
-      		'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/tox/v0.2.0/buildOnMSVC17/fullLinked/vstox.lib'
+      		'C:/Users/w3x7311/Desktop/BACKUPWindows/Actual/Programming/NodeJS/toxjs/tox/v0.2.3/buildOnMSVC17/fullLinked/vstox.lib'
     	],
       	'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }]
