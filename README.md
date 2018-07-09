@@ -20,7 +20,7 @@ Mission:
 	-  [pthreads (pthreads-w32-2-9-1-release)](http://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip)
 2. Build toxcore [using these instructions](https://github.com/TokTok/c-toxcore/blob/master/INSTALL.md#microsoft-visual-studios-developer-command-prompt)
 3. Create new Visual Studio project with master of classic windows application (select app type as static library and remove check mark from precompiled header).
-4. Add this libs as a dependencies: advapi32.lib;iphlpapi.lib;psapi.lib;shell32.lib;ws2_32.lib;libsodium.lib (don't forget specify path of libsodium.lib placed folder)
+4. Add this libs as a dependencies: advapi32.lib;iphlpapi.lib;psapi.lib;shell32.lib;ws2_32.lib;libsodium.lib (don't forget specify path of libsodium.lib placed folder. You need to build libsodium.lib from sources additionaly for your platform).
 5. Add exists elements: libsodium.lib, pthreadVC2.lib and toxcore.lib to project and build. Then you get one file *.lib, that contain above libs as one.
 6. Create empty folder and init new npm package:
 ```sh

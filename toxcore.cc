@@ -1736,6 +1736,10 @@ void ToxCore::_friendMessageChanged(Tox *tox, uint32_t friend_number, TOX_MESSAG
     });
 }
 
+/*
+ * File transmission: common between sending and receiving
+ */
+
 Napi::Value ToxCore::toxHash(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -1895,6 +1899,7 @@ Napi::Value ToxCore::toxFileSend(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
+    // arg[3] must be a string
     if (!info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsTypedArray() || !info[3].IsTypedArray() || !info[4].IsString()) {
         Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
@@ -2621,6 +2626,10 @@ void ToxCore::_friendLosslessPacketChanged(Tox *tox, uint32_t friend_number, con
         Napi::ArrayBuffer::New(toxCore->friendLosslessPacketCallback.Env(), (void*)data, length)
     });
 }
+
+/*
+ * Low-level network information
+ */
 
 Napi::Value ToxCore::toxSelfGetDhtId(const Napi::CallbackInfo& info)
 {
